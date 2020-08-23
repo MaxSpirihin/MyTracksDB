@@ -21,10 +21,6 @@ object TrackRecordManager {
         private set
     private var isRecording = false
     private var isInited = false
-
-    //TODO: move it from here
-    var metersForUpdate = 0
-    var secondsForUpdate = 0
     //endregion
 
     //region public methods
@@ -38,15 +34,13 @@ object TrackRecordManager {
 
     @SuppressLint("MissingPermission")
     @Throws(Exception::class)
-    fun startRecording(activity: Activity, seconds: Int, meters: Int) {
+    fun startRecording(activity: Activity) {
         if (isRecording) throw Exception("Record is already running. Please call StopRecording")
         isRecording = true
         Log.d("MyLogs", "Start record track")
         track = Track()
 
         //TODO: check if service is already running
-        metersForUpdate = meters
-        secondsForUpdate = seconds
         activity.startService(Intent(activity, LocationService::class.java))
     }
 

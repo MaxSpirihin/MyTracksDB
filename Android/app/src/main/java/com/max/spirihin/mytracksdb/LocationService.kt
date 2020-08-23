@@ -37,7 +37,7 @@ class LocationService : Service(), LocationListener {
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         Log.d(LOG_TAG, "onStartCommand")
         createNotificationChannel()
-        val notificationIntent = Intent(this, MainActivity::class.java)
+        val notificationIntent = Intent(this, RecordTrackActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(this,
                 0, notificationIntent, 0)
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
@@ -58,7 +58,7 @@ class LocationService : Service(), LocationListener {
         criteria.verticalAccuracy = Criteria.ACCURACY_HIGH
         val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
         locationManager.requestLocationUpdates(
-                1000 * TrackRecordManager.secondsForUpdate.toLong(), TrackRecordManager.metersForUpdate.toFloat(), criteria, this, null)
+                1000 * Preferences.gpsUpdateSeconds.toLong(), Preferences.gpsUpdateMeters.toFloat(), criteria, this, null)
         return super.onStartCommand(intent, flags, startId)
     }
 
