@@ -10,5 +10,4 @@ class TrackPoint(val time: Date, val latitude: Double, val longitude: Double, va
         val dateFormat: DateFormat = SimpleDateFormat("hh:mm:ss")
         return dateFormat.format(time) + " - " + latitude + " " + longitude + " " + accuracy
     }
-
 }

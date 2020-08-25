@@ -19,7 +19,9 @@ object TrackRecordManager {
     var mListeners = HashSet<ITrackRecordListener>()
     var track: Track? = null
         private set
-    private var isRecording = false
+    var isRecording = false
+        private set
+
     private var isInited = false
     //endregion
 

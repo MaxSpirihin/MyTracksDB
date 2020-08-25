@@ -6,8 +6,9 @@ import android.util.Log
 import org.json.JSONObject
 import org.w3c.dom.Element
 import java.io.File
-import java.io.IOException
 import java.io.StringWriter
+import java.text.DateFormat
+import java.text.SimpleDateFormat
 import java.util.*
 import javax.xml.parsers.DocumentBuilderFactory
 
@@ -15,9 +16,11 @@ class Track {
 
     //region properties
     val points: ArrayList<TrackPoint> = ArrayList()
+    var id : Int = 0
 
     val distance: Double
         get() {
+            //TODO we shouldn't compute this all the time, we need cache value and increment in addPoint
             var sum = 0.0
             for (i in 0 until points.size - 1) {
                 val p1 = points[i]
@@ -27,6 +30,18 @@ class Track {
                 sum += result[0]
             }
             return sum
+        }
+
+    /* full duration in seconds */
+    val duration: Long
+        get() = if (points.size < 2) 0 else (points.last().time.time - points.first().time.time) / 1000
+
+    val timeStr: String
+        get() {
+            if (points.isEmpty())
+                return ""
+            val dateFormat: DateFormat = SimpleDateFormat("dd.MM - hh:mm:ss")
+            return dateFormat.format(points[0].time)
         }
     //endregion
 

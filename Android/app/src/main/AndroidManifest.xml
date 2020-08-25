@@ -17,9 +17,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity
-            android:name=".SettingsActivity"
-            android:label="@string/title_activity_settings"></activity>
+        <activity android:name=".TracksListActivity"></activity>
+        <activity android:name=".SettingsActivity" />
 
         <service
             android:name=".LocationService"
@@ -27,6 +26,7 @@
             android:exported="true" />
 
         <activity android:name=".RecordTrackActivity" />
+        <activity android:name=".ShowTrackActivity" />
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

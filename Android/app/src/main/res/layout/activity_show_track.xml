@@ -19,25 +19,18 @@
             android:layout_width="match_parent"
             android:layout_height="350dp"/>
 
-            <LinearLayout
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
                 <Button
-                    android:id="@+id/btnStart"
-                    android:layout_width="0dp"
+                    android:id="@+id/btnLoadGPX"
+                    android:layout_width="100dp"
                     android:layout_height="150px"
-                    android:layout_weight=".5"
-                    android:text="Start" />
-
-                <Button
-                    android:id="@+id/btnStop"
-                    android:layout_width="0dp"
-                    android:layout_height="150px"
-                    android:layout_weight=".5"
-                    android:text="stop" />
-            </LinearLayout>
+                    android:layout_alignParentRight="true"
+                    android:text="LoadGPX" />
+            </RelativeLayout>
 
             <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
                 xmlns:app="http://schemas.android.com/apk/res-auto"

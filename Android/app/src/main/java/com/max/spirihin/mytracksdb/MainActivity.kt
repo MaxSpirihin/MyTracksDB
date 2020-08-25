@@ -43,7 +43,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         findViewById<View>(R.id.btnTracksList).setOnClickListener {
-            //todo
+            val intent = Intent(this, TracksListActivity::class.java)
+            startActivity(intent)
         }
 
         findViewById<View>(R.id.btnSettings).setOnClickListener {
