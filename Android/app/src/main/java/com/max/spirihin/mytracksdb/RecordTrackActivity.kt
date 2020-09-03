@@ -33,13 +33,13 @@ class RecordTrackActivity : AppCompatActivity(), ITrackRecordListener {
         yandexMap = YandexMap(findViewById(R.id.mapview))
 
         textView = findViewById(R.id.textViewData)
-        TrackRecordManager.init(this)
-        TrackRecordManager.registerListener(this)
 
         btnStart = findViewById(R.id.btnStart)
         btnStop = findViewById(R.id.btnStop)
 
         updateState(if (TrackRecordManager.isRecording) RecordState.RECORD else RecordState.NONE)
+        if (TrackRecordManager.isRecording && TrackRecordManager.track != null)
+            onReceive(TrackRecordManager.track!!)
 
         btnStart!!.setOnClickListener {
             when (state) {
@@ -68,16 +68,19 @@ class RecordTrackActivity : AppCompatActivity(), ITrackRecordListener {
             val intent = Intent(this, ShowTrackActivity::class.java)
             intent.putExtra(ShowTrackActivity.TRACK_ID_INTENT_STRING, id)
             startActivity(intent)
+            finish()
         }
     }
 
     override fun onStop() {
         yandexMap!!.onStop()
+        TrackRecordManager.unregisterListener(this)
         super.onStop()
     }
 
     override fun onStart() {
         super.onStart()
+        TrackRecordManager.registerListener(this)
         yandexMap!!.onStart()
     }
 
@@ -94,7 +97,7 @@ class RecordTrackActivity : AppCompatActivity(), ITrackRecordListener {
     }
 
     private fun updateText(track: Track) {
-        textView!!.text = "time=${track.duration}\ndistance=${track.distance}\npoints=${track.points.size}"
+        textView!!.text = track.infoStr
     }
 
     override fun onReceive(track: Track) {

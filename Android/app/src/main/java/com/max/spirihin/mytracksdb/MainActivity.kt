@@ -38,19 +38,24 @@ class MainActivity : AppCompatActivity() {
 
     private fun init() {
         findViewById<View>(R.id.btnStartRecording).setOnClickListener {
-            val intent = Intent(this, RecordTrackActivity::class.java)
-            startActivity(intent)
+            startActivity(RecordTrackActivity::class.java)
         }
 
         findViewById<View>(R.id.btnTracksList).setOnClickListener {
-            val intent = Intent(this, TracksListActivity::class.java)
-            startActivity(intent)
+            startActivity(TracksListActivity::class.java)
         }
 
         findViewById<View>(R.id.btnSettings).setOnClickListener {
-            val intent = Intent(this, SettingsActivity::class.java)
-            startActivity(intent)
+            startActivity(SettingsActivity::class.java)
         }
+
+        if (TrackRecordManager.isRecording && TrackRecordManager.track != null)
+            startActivity(RecordTrackActivity::class.java)
+    }
+
+    private fun startActivity(cls: Class<*>) {
+        val intent = Intent(this, cls)
+        startActivity(intent)
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {

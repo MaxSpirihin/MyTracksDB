@@ -2,11 +2,15 @@ package com.max.spirihin.mytracksdb
 
 import android.os.Environment
 import java.io.File
+import java.sql.Date
+import java.text.ParseException
+import java.text.SimpleDateFormat
 
 object TracksDatabase {
 
     private var idCounter: Int? = null
     private val directoryPath: String = Environment.getExternalStorageDirectory().absolutePath + "/MyTracksDB"
+    private val gpxPath: String = Environment.getExternalStorageDirectory().absolutePath + "/S Health/GPX"
 
     private fun getNextId() : Int {
         if (idCounter == null) {
@@ -33,12 +37,16 @@ object TracksDatabase {
         return track.id
     }
 
+    fun deleteTrack(track: Track) {
+        trackFileInStorage(track.id).delete()
+    }
+
     fun loadTrackByID(id: Int) : Track? {
         val file = trackFileInStorage(id)
         if (!file.exists())
             return null
 
-        return Track.fromJSON(file.readText())
+        return Track.fromJSON(file.nameWithoutExtension.toInt(), file.readText())
     }
 
     fun loadAllTracks() : ArrayList<Track> {
@@ -49,9 +57,8 @@ object TracksDatabase {
 
         val result = arrayListOf<Track>()
         File(directoryPath).listFiles().forEach { file ->
-            val track = Track.fromJSON(file.readText())
+            val track = Track.fromJSON(file.nameWithoutExtension.toInt(), file.readText())
             if (track != null) {
-                track.id = file.nameWithoutExtension.toInt()
                 result.add(track)
             }
         }
@@ -59,8 +66,23 @@ object TracksDatabase {
         return result
     }
 
-    fun tryLoadGPXForTrack(track: Track) : Track? {
-        throw NotImplementedError("aaa")
+    fun tryLoadGPXForTrack(track: Track) : Pair<Track?, HashMap<String, String>> {
+        if (!File(gpxPath).exists())
+            return Pair(null, HashMap())
+
+        var files = File(gpxPath).listFiles()
+        for (file in files) {
+            try {
+                val dateFromFileName = SimpleDateFormat("yyyyMMdd_hhmmss").parse(file.nameWithoutExtension)
+                if (Math.abs(track.points.first().time.time - dateFromFileName.time) < 60 * 1000) {
+                    return Track.fromGPX(file)
+                }
+            } catch (e : ParseException) {
+                //ignored
+            }
+        }
+
+        return Pair(null, HashMap())
     }
 
 }

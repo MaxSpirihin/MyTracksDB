@@ -11,14 +11,15 @@ import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.xml.parsers.DocumentBuilderFactory
+import kotlin.collections.HashMap
 
 class Track {
 
     //region properties
     val points: ArrayList<TrackPoint> = ArrayList()
-    var id : Int = 0
+    var id: Int = 0
 
-    val distance: Double
+    val distance: Int
         get() {
             //TODO we shouldn't compute this all the time, we need cache value and increment in addPoint
             var sum = 0.0
@@ -29,19 +30,34 @@ class Track {
                 Location.distanceBetween(p1.latitude, p1.longitude, p2.latitude, p2.longitude, result)
                 sum += result[0]
             }
-            return sum
+            return sum.toInt()
         }
 
+    val startTime: Date
+        get() = if (points.size < 1) Date() else points[0].time
+
     /* full duration in seconds */
-    val duration: Long
-        get() = if (points.size < 2) 0 else (points.last().time.time - points.first().time.time) / 1000
+    val duration: Int
+        get() = if (points.size < 2) 0 else ((points.last().time.time - points.first().time.time) / 1000).toInt()
+
+    /* pace in seconds */
+    val pace: Int
+        get() = (duration * 1000 / distance).toInt();
 
     val timeStr: String
         get() {
-            if (points.isEmpty())
-                return ""
             val dateFormat: DateFormat = SimpleDateFormat("dd.MM - hh:mm:ss")
-            return dateFormat.format(points[0].time)
+            return dateFormat.format(startTime)
+        }
+
+    val speechStr: String
+        get() {
+            return "Pass $distance meters. Pace is ${pace / 60} minutes ${pace % 60} seconds"
+        }
+
+    val infoStr: String
+        get() {
+            return "time=${secondsToString(duration)}\ndistance=${distance}\npace=${secondsToString(pace)}\npoints=${points.size}"
         }
     //endregion
 
@@ -73,16 +89,18 @@ class Track {
     }
 
     companion object {
-        fun fromGPX(file: File?): Track? {
+        fun fromGPX(file: File?): Pair<Track?, HashMap<String, String>> {
             return try {
+                val track = Track()
+                val params = HashMap<String, String>()
+
                 val dbFactory = DocumentBuilderFactory.newInstance()
                 val dBuilder = dbFactory.newDocumentBuilder()
                 val doc = dBuilder.parse(file)
                 doc.documentElement.normalize()
                 val gpx = doc.getElementsByTagName("gpx").item(0) as Element
-                val trkList = gpx.getElementsByTagName("trk")
-                val trk = trkList.item(0) as Element
-                val track = Track()
+                val trk = gpx.getElementsByTagName("trk").item(0) as Element
+
                 val segments = trk.getElementsByTagName("trkseg")
                 for (temp in 0 until segments.length) {
                     val segment = segments.item(temp) as Element
@@ -91,21 +109,32 @@ class Track {
                         val point = points.item(i) as Element
                         val latitude = point.getAttribute("lat").toDouble()
                         val longitude = point.getAttribute("lon").toDouble()
-                        track.points.add(TrackPoint(Calendar.getInstance().time, latitude, longitude, 0.0))
+                        val timeStr = (point.getElementsByTagName("time").item(0) as Element).textContent
+                        val format = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
+                        val time = format.parse(timeStr)
+                        track.points.add(TrackPoint(time!!, latitude, longitude, 0.0))
                     }
                 }
-                track
+                val exerciseinfos = (gpx.getElementsByTagName("exerciseinfo").item(0) as Element).childNodes
+                for (temp in 0 until exerciseinfos.length) {
+                    val param = exerciseinfos.item(temp) as? Element
+                    if (param != null)
+                        params[param.tagName] = param.textContent
+                }
+
+                Pair(track, params)
             } catch (e: Exception) {
-                Log.e("myLogs", e.message ?: "")
-                null
+                Log.e("myLogs", e.toString())
+                Pair(null, HashMap())
             }
         }
 
-        fun fromJSON(jsonString: String?): Track? {
+        fun fromJSON(id: Int, jsonString: String?): Track? {
             return try {
                 val jsonRoot = JSONObject(jsonString ?: return null)
                 val jsonArray = jsonRoot.getJSONArray("Track")
                 val track = Track()
+                track.id = id
                 for (i in 0 until jsonArray.length()) {
                     val pointJson = jsonArray.getJSONObject(i)
                     track.points.add(TrackPoint(
@@ -120,6 +149,13 @@ class Track {
                 Log.e("myLogs", e.message ?: "")
                 null
             }
+        }
+
+        private fun secondsToString(seconds : Int) : String {
+            val h = seconds / 3600
+            val m = (seconds / 60) % 60
+            val s = seconds % 60
+            return "${if (h > 0) "${String.format("%02d",h)}:" else ""}${String.format("%02d",m)}:${String.format("%02d",s)}"
         }
     }
     //endregion

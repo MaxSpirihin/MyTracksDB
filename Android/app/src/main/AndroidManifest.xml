@@ -21,7 +21,7 @@
         <activity android:name=".SettingsActivity" />
 
         <service
-            android:name=".LocationService"
+            android:name=".RecordTrackService"
             android:enabled="true"
             android:exported="true" />
 
@@ -34,6 +34,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+
+
     </application>
+
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.TTS_SERVICE" />
+        </intent>
+    </queries>
 
 </manifest>

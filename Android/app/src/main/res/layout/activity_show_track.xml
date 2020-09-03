@@ -25,6 +25,14 @@
                 android:orientation="horizontal">
 
                 <Button
+                    android:id="@+id/btnDelete"
+                    android:layout_width="100dp"
+                    android:layout_height="150px"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="115dp"
+                    android:text="delete" />
+
+                <Button
                     android:id="@+id/btnLoadGPX"
                     android:layout_width="100dp"
                     android:layout_height="150px"

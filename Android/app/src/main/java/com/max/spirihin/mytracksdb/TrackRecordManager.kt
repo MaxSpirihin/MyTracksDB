@@ -5,7 +5,6 @@ import android.app.Activity
 import android.content.Intent
 import android.location.Location
 import android.util.Log
-import android.widget.Toast
 import java.util.*
 
 object TrackRecordManager {
@@ -22,17 +21,7 @@ object TrackRecordManager {
     var isRecording = false
         private set
 
-    private var isInited = false
     //endregion
-
-    //region public methods
-    fun init(activity: Activity) {
-        if (isInited) {
-            Toast.makeText(activity.applicationContext, "TrackRecordManager already inited", Toast.LENGTH_LONG).show()
-            return
-        }
-        isInited = true
-    }
 
     @SuppressLint("MissingPermission")
     @Throws(Exception::class)
@@ -43,11 +32,11 @@ object TrackRecordManager {
         track = Track()
 
         //TODO: check if service is already running
-        activity.startService(Intent(activity, LocationService::class.java))
+        activity.startService(Intent(activity, RecordTrackService::class.java))
     }
 
     fun addTrackPoint(location: Location?) {
-        if (!isInited || !isRecording) return
+        if (!isRecording) return
         if (location == null || track == null) return
         track!!.addPoint(location)
         for (listener in mListeners) {
@@ -58,7 +47,7 @@ object TrackRecordManager {
     fun stopRecording(activity: Activity) {
         if (!isRecording) return
         isRecording = false
-        activity.stopService(Intent(activity, LocationService::class.java))
+        activity.stopService(Intent(activity, RecordTrackService::class.java))
     }
 
     fun registerListener(listener: ITrackRecordListener) {
