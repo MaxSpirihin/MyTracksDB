@@ -1,10 +1,11 @@
-package com.max.spirihin.mytracksdb
+package com.max.spirihin.mytracksdb.activities
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.EditText
-import androidx.core.widget.addTextChangedListener
 import androidx.core.widget.doOnTextChanged
+import com.max.spirihin.mytracksdb.utilities.Preferences
+import com.max.spirihin.mytracksdb.R
 
 class SettingsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -1,6 +1,5 @@
-package com.max.spirihin.mytracksdb
+package com.max.spirihin.mytracksdb.activities
 
-import android.content.DialogInterface
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
@@ -10,6 +9,9 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import com.max.spirihin.mytracksdb.R
+import com.max.spirihin.mytracksdb.core.TracksDatabase
+import com.max.spirihin.mytracksdb.ui.YandexMap
 
 
 class ShowTrackActivity : AppCompatActivity() {

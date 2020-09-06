@@ -1,10 +1,11 @@
-package com.max.spirihin.mytracksdb
+package com.max.spirihin.mytracksdb.core
 
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.location.Location
-import android.util.Log
+import com.max.spirihin.mytracksdb.services.RecordTrackService
+import com.max.spirihin.mytracksdb.utilities.Print
 import java.util.*
 
 object TrackRecordManager {
@@ -28,7 +29,7 @@ object TrackRecordManager {
     fun startRecording(activity: Activity) {
         if (isRecording) throw Exception("Record is already running. Please call StopRecording")
         isRecording = true
-        Log.d("MyLogs", "Start record track")
+        Print.Log("Start record track")
         track = Track()
 
         //TODO: check if service is already running

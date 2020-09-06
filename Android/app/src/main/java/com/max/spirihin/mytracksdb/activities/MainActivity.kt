@@ -1,14 +1,16 @@
-package com.max.spirihin.mytracksdb
+package com.max.spirihin.mytracksdb.activities
 
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import com.max.spirihin.mytracksdb.utilities.Preferences
+import com.max.spirihin.mytracksdb.R
+import com.max.spirihin.mytracksdb.core.TrackRecordManager
 import com.yandex.mapkit.MapKitFactory
 
 class MainActivity : AppCompatActivity() {

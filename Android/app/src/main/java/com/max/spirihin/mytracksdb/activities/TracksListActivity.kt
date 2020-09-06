@@ -1,10 +1,13 @@
-package com.max.spirihin.mytracksdb
+package com.max.spirihin.mytracksdb.activities
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.ArrayAdapter
 import android.widget.ListView
+import com.max.spirihin.mytracksdb.R
+import com.max.spirihin.mytracksdb.core.Track
+import com.max.spirihin.mytracksdb.core.TracksDatabase
 
 class TracksListActivity : AppCompatActivity() {
 

@@ -1,8 +1,8 @@
-package com.max.spirihin.mytracksdb
+package com.max.spirihin.mytracksdb.core
 
 import android.location.Location
 import android.util.JsonWriter
-import android.util.Log
+import com.max.spirihin.mytracksdb.utilities.Print
 import org.json.JSONObject
 import org.w3c.dom.Element
 import java.io.File
@@ -124,7 +124,7 @@ class Track {
 
                 Pair(track, params)
             } catch (e: Exception) {
-                Log.e("myLogs", e.toString())
+                Print.LogError(e.toString())
                 Pair(null, HashMap())
             }
         }
@@ -146,7 +146,7 @@ class Track {
                 }
                 track
             } catch (e: Exception) {
-                Log.e("myLogs", e.message ?: "")
+                Print.LogError(e.toString())
                 null
             }
         }

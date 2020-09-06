@@ -1,4 +1,4 @@
-package com.max.spirihin.mytracksdb
+package com.max.spirihin.mytracksdb.core
 
 import java.text.DateFormat
 import java.text.SimpleDateFormat

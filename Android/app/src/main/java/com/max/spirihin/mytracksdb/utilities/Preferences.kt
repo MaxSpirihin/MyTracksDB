@@ -1,4 +1,4 @@
-package com.max.spirihin.mytracksdb
+package com.max.spirihin.mytracksdb.utilities
 
 import android.app.Activity
 import android.content.Context

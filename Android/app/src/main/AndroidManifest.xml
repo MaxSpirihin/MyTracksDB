@@ -17,17 +17,17 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".TracksListActivity"></activity>
-        <activity android:name=".SettingsActivity" />
+        <activity android:name=".activities.TracksListActivity"></activity>
+        <activity android:name=".activities.SettingsActivity" />
 
         <service
-            android:name=".RecordTrackService"
+            android:name=".services.RecordTrackService"
             android:enabled="true"
             android:exported="true" />
 
-        <activity android:name=".RecordTrackActivity" />
-        <activity android:name=".ShowTrackActivity" />
-        <activity android:name=".MainActivity">
+        <activity android:name=".activities.RecordTrackActivity" />
+        <activity android:name=".activities.ShowTrackActivity" />
+        <activity android:name=".activities.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

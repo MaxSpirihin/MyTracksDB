@@ -1,8 +1,7 @@
-package com.max.spirihin.mytracksdb
+package com.max.spirihin.mytracksdb.core
 
 import android.os.Environment
 import java.io.File
-import java.sql.Date
 import java.text.ParseException
 import java.text.SimpleDateFormat
 

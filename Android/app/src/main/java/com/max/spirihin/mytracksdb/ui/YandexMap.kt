@@ -1,5 +1,6 @@
-package com.max.spirihin.mytracksdb
+package com.max.spirihin.mytracksdb.ui
 
+import com.max.spirihin.mytracksdb.core.Track
 import com.yandex.mapkit.Animation
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point

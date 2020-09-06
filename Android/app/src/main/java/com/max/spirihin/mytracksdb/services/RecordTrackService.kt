@@ -1,6 +1,5 @@
-package com.max.spirihin.mytracksdb
+package com.max.spirihin.mytracksdb.services
 
-import android.R.attr.data
 import android.annotation.SuppressLint
 import android.app.*
 import android.content.Context
@@ -9,12 +8,15 @@ import android.location.Criteria
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
-import android.os.Build
 import android.os.IBinder
 import android.speech.tts.TextToSpeech
-import android.util.Log
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
+import com.max.spirihin.mytracksdb.utilities.Preferences
+import com.max.spirihin.mytracksdb.R
+import com.max.spirihin.mytracksdb.activities.RecordTrackActivity
+import com.max.spirihin.mytracksdb.core.TrackRecordManager
+import com.max.spirihin.mytracksdb.utilities.Print
 import java.util.*
 
 class RecordTrackService : Service(), LocationListener {
@@ -24,7 +26,6 @@ class RecordTrackService : Service(), LocationListener {
     var notification: Notification? = null
 
     companion object {
-        const val LOG_TAG = "myLogs"
         const val NOTIFICATION_ID = 10
         const val CHANNEL_ID = "LocationService"
         const val SPEECH_UPDATE_DISTANCE = 500
@@ -32,7 +33,8 @@ class RecordTrackService : Service(), LocationListener {
 
     override fun onCreate() {
         super.onCreate()
-        Log.d(LOG_TAG, "onCreate")
+
+        Print.Log("[RecordTrackService] onCreate")
 
         textToSpeech = TextToSpeech(applicationContext) { status ->
             if (status == TextToSpeech.SUCCESS) {
@@ -50,7 +52,7 @@ class RecordTrackService : Service(), LocationListener {
     }
 
     override fun onLocationChanged(location: Location) {
-        Log.d("MyLogs", "LocationListener " + location.longitude + " " + location.latitude + " " + location.accuracy)
+        Print.Log("[RecordTrackService] onLocationChanged ${location.longitude} ${location.latitude} ${location.accuracy}")
         TrackRecordManager.addTrackPoint(location)
         val track = TrackRecordManager.track!!
         updateNotification("Running", "${track.distance.toInt()}m. | ${track.duration / 60}:${track.duration % 60}")
@@ -63,7 +65,7 @@ class RecordTrackService : Service(), LocationListener {
 
     @SuppressLint("MissingPermission")
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
-        Log.d(LOG_TAG, "onStartCommand")
+        Print.Log("[RecordTrackService] onStartCommand")
         updateNotification("Running", "")
 
         val criteria = Criteria()
@@ -91,11 +93,10 @@ class RecordTrackService : Service(), LocationListener {
             textToSpeech!!.shutdown()
         }
 
-        Log.d(LOG_TAG, "onDestroy")
+        Print.Log("[RecordTrackService] onDestroy")
     }
 
     override fun onBind(intent: Intent): IBinder? {
-        Log.d(LOG_TAG, "onBind")
         return null
     }
 

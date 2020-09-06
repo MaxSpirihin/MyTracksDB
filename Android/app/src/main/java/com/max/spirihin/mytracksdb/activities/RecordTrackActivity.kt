@@ -1,4 +1,4 @@
-package com.max.spirihin.mytracksdb
+package com.max.spirihin.mytracksdb.activities
 
 import android.content.Intent
 import android.graphics.Color
@@ -8,7 +8,12 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import com.max.spirihin.mytracksdb.TrackRecordManager.ITrackRecordListener
+import com.max.spirihin.mytracksdb.*
+import com.max.spirihin.mytracksdb.core.TrackRecordManager.ITrackRecordListener
+import com.max.spirihin.mytracksdb.core.Track
+import com.max.spirihin.mytracksdb.core.TrackRecordManager
+import com.max.spirihin.mytracksdb.core.TracksDatabase
+import com.max.spirihin.mytracksdb.ui.YandexMap
 
 class RecordTrackActivity : AppCompatActivity(), ITrackRecordListener {
 
