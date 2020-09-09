@@ -51,6 +51,10 @@ class MainActivity : AppCompatActivity() {
             startActivity(SettingsActivity::class.java)
         }
 
+        findViewById<View>(R.id.btnTest).setOnClickListener {
+            startActivity(StepCounterTestActivity::class.java)
+        }
+
         if (TrackRecordManager.isRecording && TrackRecordManager.track != null)
             startActivity(RecordTrackActivity::class.java)
     }
@@ -64,7 +68,7 @@ class MainActivity : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
         if (requestCode != 1) {
-            Toast.makeText(this, "You should grant all permissions. Restart app and do it", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "You should grant all permissions. Restart app and do it", Toast.LENGTH_LONG).show()
             return
         }
 

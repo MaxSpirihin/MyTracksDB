@@ -49,9 +49,9 @@ class ShowTrackActivity : AppCompatActivity() {
 
             gpxLoaded = true
 
-            val gpxData = TracksDatabase.tryLoadGPXForTrack(track);
-            val trackFromGPX = gpxData.first;
-            val gpxParams = gpxData.second;
+            val gpxData = TracksDatabase.tryLoadGPXForTrack(track)
+            val trackFromGPX = gpxData.first
+            val gpxParams = gpxData.second
 
             if (trackFromGPX == null) {
                 Toast.makeText(this, "gpx not found", Toast.LENGTH_LONG).show()

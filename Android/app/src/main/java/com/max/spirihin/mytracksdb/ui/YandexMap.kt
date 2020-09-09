@@ -10,9 +10,8 @@ import com.yandex.mapkit.map.MapObjectCollection
 import com.yandex.mapkit.mapview.MapView
 import java.util.ArrayList
 
-class YandexMap constructor(mapView: MapView){
+class YandexMap constructor(private val mapView: MapView){
 
-    private val mapView: MapView = mapView
     private val mapObjects: MapObjectCollection? = mapView.map.mapObjects.addCollection()
 
     private var isMapZoomed = false
@@ -34,7 +33,7 @@ class YandexMap constructor(mapView: MapView){
     }
 
     fun showTrack(track: Track?, color: Int, clear: Boolean) {
-        if (mapView == null || track == null) return
+        if (track == null) return
 
         val polylinePoints = ArrayList<Point>()
         for (point in track.points) {

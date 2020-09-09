@@ -51,11 +51,12 @@ class RecordTrackService : Service(), LocationListener {
         distanceForSpeech = SPEECH_UPDATE_DISTANCE
     }
 
+    @Suppress("DEPRECATION")
     override fun onLocationChanged(location: Location) {
         Print.Log("[RecordTrackService] onLocationChanged ${location.longitude} ${location.latitude} ${location.accuracy}")
         TrackRecordManager.addTrackPoint(location)
         val track = TrackRecordManager.track!!
-        updateNotification("Running", "${track.distance.toInt()}m. | ${track.duration / 60}:${track.duration % 60}")
+        updateNotification("Running", "${track.distance}m. | ${track.duration / 60}:${track.duration % 60}")
 
         if (TrackRecordManager.track!!.distance > distanceForSpeech) {
             textToSpeech!!.speak(TrackRecordManager.track!!.speechStr, TextToSpeech.QUEUE_FLUSH, null)

@@ -7,11 +7,11 @@ import org.json.JSONObject
 import org.w3c.dom.Element
 import java.io.File
 import java.io.StringWriter
-import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.xml.parsers.DocumentBuilderFactory
 import kotlin.collections.HashMap
+import com.max.spirihin.mytracksdb.utilities.toShortString
 
 class Track {
 
@@ -42,13 +42,10 @@ class Track {
 
     /* pace in seconds */
     val pace: Int
-        get() = (duration * 1000 / distance).toInt();
+        get() = duration * 1000 / distance
 
     val timeStr: String
-        get() {
-            val dateFormat: DateFormat = SimpleDateFormat("dd.MM - hh:mm:ss")
-            return dateFormat.format(startTime)
-        }
+        get() = startTime.toShortString()
 
     val speechStr: String
         get() {
@@ -115,9 +112,9 @@ class Track {
                         track.points.add(TrackPoint(time!!, latitude, longitude, 0.0))
                     }
                 }
-                val exerciseinfos = (gpx.getElementsByTagName("exerciseinfo").item(0) as Element).childNodes
-                for (temp in 0 until exerciseinfos.length) {
-                    val param = exerciseinfos.item(temp) as? Element
+                val exerciseInfos = (gpx.getElementsByTagName("exerciseinfo").item(0) as Element).childNodes
+                for (temp in 0 until exerciseInfos.length) {
+                    val param = exerciseInfos.item(temp) as? Element
                     if (param != null)
                         params[param.tagName] = param.textContent
                 }
