@@ -36,10 +36,10 @@ object TrackRecordManager {
         activity.startService(Intent(activity, RecordTrackService::class.java))
     }
 
-    fun addTrackPoint(location: Location?) {
+    fun addTrackPoint(location: Location?, steps: Int) {
         if (!isRecording) return
         if (location == null || track == null) return
-        track!!.addPoint(location)
+        track!!.addPoint(location, steps)
         for (listener in mListeners) {
             listener.onReceive(track!!)
         }

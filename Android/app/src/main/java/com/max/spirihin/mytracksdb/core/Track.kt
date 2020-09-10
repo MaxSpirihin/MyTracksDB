@@ -15,10 +15,12 @@ import com.max.spirihin.mytracksdb.utilities.toShortString
 
 class Track {
 
-    //region properties
+    //region attrubutes
     val points: ArrayList<TrackPoint> = ArrayList()
     var id: Int = 0
+    //endregion
 
+    //region properties
     val distance: Int
         get() {
             //TODO we shouldn't compute this all the time, we need cache value and increment in addPoint
@@ -42,7 +44,7 @@ class Track {
 
     /* pace in seconds */
     val pace: Int
-        get() = duration * 1000 / distance
+        get() = if (distance > 0) duration * 1000 / distance else 0
 
     val timeStr: String
         get() = startTime.toShortString()
@@ -54,13 +56,20 @@ class Track {
 
     val infoStr: String
         get() {
-            return "time=${secondsToString(duration)}\ndistance=${distance}\npace=${secondsToString(pace)}\npoints=${points.size}"
+            return "time=${secondsToString(duration)}\ndistance=${distance}\npace=${secondsToString(pace)}\npoints=${points.size}\nsteps=${points.last().steps}"
         }
     //endregion
 
     //region public methods
-    fun addPoint(location: Location): TrackPoint {
-        val point = TrackPoint(Calendar.getInstance().time, location.latitude, location.longitude, location.accuracy.toDouble())
+    fun addPoint(location: Location, steps: Int): TrackPoint {
+        val point = TrackPoint(
+                Calendar.getInstance().time,
+                location.latitude,
+                location.longitude,
+                location.accuracy.toDouble(),
+                steps
+        )
+
         points.add(point)
         return point
     }
@@ -78,6 +87,7 @@ class Track {
             jsonWriter.name("latitude").value(point.latitude)
             jsonWriter.name("longitude").value(point.longitude)
             jsonWriter.name("accuracy").value(point.accuracy)
+            jsonWriter.name("steps").value(point.steps)
             jsonWriter.endObject()
         }
         jsonWriter.endArray()
@@ -109,7 +119,7 @@ class Track {
                         val timeStr = (point.getElementsByTagName("time").item(0) as Element).textContent
                         val format = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
                         val time = format.parse(timeStr)
-                        track.points.add(TrackPoint(time!!, latitude, longitude, 0.0))
+                        track.points.add(TrackPoint(time!!, latitude, longitude, 0.0, 0))
                     }
                 }
                 val exerciseInfos = (gpx.getElementsByTagName("exerciseinfo").item(0) as Element).childNodes
@@ -138,8 +148,9 @@ class Track {
                             Date(pointJson.getLong("date")),
                             pointJson.getDouble("latitude"),
                             pointJson.getDouble("longitude"),
-                            pointJson.getDouble("accuracy"))
-                    )
+                            pointJson.getDouble("accuracy"),
+                            if (pointJson.has("steps")) pointJson.getInt("steps") else 0
+                    ))
                 }
                 track
             } catch (e: Exception) {

@@ -22,18 +22,24 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        if (ContextCompat.checkSelfPermission(
-                        applicationContext, Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
-                PackageManager.PERMISSION_GRANTED) {
+        val permissions = arrayOf(
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_BACKGROUND_LOCATION,
+                Manifest.permission.ACTIVITY_RECOGNITION,
+                Manifest.permission.ACCESS_COARSE_LOCATION);
+
+
+
+        if (permissions.all { p ->
+                    ContextCompat.checkSelfPermission(
+                            applicationContext, p) ==
+                            PackageManager.PERMISSION_GRANTED
+                }) {
             init()
         } else {
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-                requestPermissions(arrayOf(
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                        Manifest.permission.ACCESS_FINE_LOCATION,
-                        Manifest.permission.ACCESS_BACKGROUND_LOCATION,
-                        Manifest.permission.ACCESS_COARSE_LOCATION),
-                        1)
+                requestPermissions(permissions, 1)
             }
         }
     }

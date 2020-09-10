@@ -2,32 +2,33 @@ package com.max.spirihin.mytracksdb.services
 
 import android.annotation.SuppressLint
 import android.app.*
-import android.content.Context
 import android.content.Intent
-import android.location.Criteria
 import android.location.Location
-import android.location.LocationListener
-import android.location.LocationManager
+import android.os.Build
 import android.os.IBinder
 import android.speech.tts.TextToSpeech
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
-import com.max.spirihin.mytracksdb.utilities.Preferences
 import com.max.spirihin.mytracksdb.R
 import com.max.spirihin.mytracksdb.activities.RecordTrackActivity
+import com.max.spirihin.mytracksdb.listeners.StepCounterListener
 import com.max.spirihin.mytracksdb.core.TrackRecordManager
+import com.max.spirihin.mytracksdb.listeners.LocationListener
 import com.max.spirihin.mytracksdb.utilities.Print
 import java.util.*
 
-class RecordTrackService : Service(), LocationListener {
+class RecordTrackService : Service() {
 
     private var textToSpeech: TextToSpeech? = null//todo move to separate class
-    var distanceForSpeech : Int = 0
-    var notification: Notification? = null
+    private var distanceForSpeech : Int = 0
+    private var stepCounterListener : StepCounterListener? = null
+    private var locationListener : LocationListener? = null
+
+    private var notification: Notification? = null
 
     companion object {
         const val NOTIFICATION_ID = 10
-        const val CHANNEL_ID = "LocationService"
+        const val CHANNEL_ID = "RecordTrackService"
         const val SPEECH_UPDATE_DISTANCE = 500
     }
 
@@ -49,12 +50,13 @@ class RecordTrackService : Service(), LocationListener {
         }
 
         distanceForSpeech = SPEECH_UPDATE_DISTANCE
+        stepCounterListener = StepCounterListener()
+        locationListener = LocationListener { location -> onLocationChanged(location) }
     }
 
     @Suppress("DEPRECATION")
-    override fun onLocationChanged(location: Location) {
-        Print.Log("[RecordTrackService] onLocationChanged ${location.longitude} ${location.latitude} ${location.accuracy}")
-        TrackRecordManager.addTrackPoint(location)
+    fun onLocationChanged(location: Location) {
+        TrackRecordManager.addTrackPoint(location, stepCounterListener?.stepsCount ?: 0)
         val track = TrackRecordManager.track!!
         updateNotification("Running", "${track.distance}m. | ${track.duration / 60}:${track.duration % 60}")
 
@@ -67,34 +69,24 @@ class RecordTrackService : Service(), LocationListener {
     @SuppressLint("MissingPermission")
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         Print.Log("[RecordTrackService] onStartCommand")
+        createNotificationChannel()
         updateNotification("Running", "")
 
-        val criteria = Criteria()
-        criteria.accuracy = Criteria.ACCURACY_FINE
-        criteria.powerRequirement = Criteria.POWER_HIGH
-        criteria.isAltitudeRequired = false
-        criteria.isSpeedRequired = false
-        criteria.isCostAllowed = true
-        criteria.isBearingRequired = false
-        criteria.horizontalAccuracy = Criteria.ACCURACY_HIGH
-        criteria.verticalAccuracy = Criteria.ACCURACY_HIGH
-        val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        locationManager.requestLocationUpdates(
-                1000 * Preferences.gpsUpdateSeconds.toLong(), Preferences.gpsUpdateMeters.toFloat(), criteria, this, null)
+        locationListener?.startListen(this)
+        stepCounterListener?.startListen(this)
         return super.onStartCommand(intent, flags, startId)
     }
 
     override fun onDestroy() {
-        super.onDestroy()
-        val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        locationManager.removeUpdates(this)
-
-        if (textToSpeech != null) {
-            textToSpeech!!.stop()
-            textToSpeech!!.shutdown()
-        }
-
         Print.Log("[RecordTrackService] onDestroy")
+
+        textToSpeech?.stop()
+        textToSpeech?.shutdown()
+
+        locationListener?.stopListen()
+        stepCounterListener?.stopListen()
+
+        super.onDestroy()
     }
 
     override fun onBind(intent: Intent): IBinder? {
@@ -112,5 +104,17 @@ class RecordTrackService : Service(), LocationListener {
                 .build()
 
         startForeground(NOTIFICATION_ID, notification)
+    }
+
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val serviceChannel = NotificationChannel(
+                    CHANNEL_ID,
+                    "RecordTrackService",
+                    NotificationManager.IMPORTANCE_DEFAULT
+            )
+            val manager = getSystemService(NotificationManager::class.java)
+            manager.createNotificationChannel(serviceChannel)
+        }
     }
 }
