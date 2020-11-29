@@ -46,28 +46,58 @@ class Track {
     val pace: Int
         get() = if (distance > 0) duration * 1000 / distance else 0
 
+    val totalSteps: Int
+        get() = if (points.isNotEmpty()) points.last().steps else 0
+
+    val cadence: Int
+        get() = if (duration > 0) totalSteps * 60 / duration else 0
+
+    val averageHeartrate : Int
+        get() {
+            var heartrateSum = 0
+            var pointsCount = 0
+            for (point in points) {
+                if (point.heartrate > 0) {
+                    heartrateSum += point.heartrate
+                    pointsCount++
+                }
+            }
+            return if (pointsCount > 0) heartrateSum / pointsCount else 0
+        }
+
+    val currentHeartrate : Int
+        get() = if (points.isNotEmpty()) points.last().heartrate else 0
+
     val timeStr: String
         get() = startTime.toShortString()
 
     val speechStr: String
         get() {
-            return "Pass $distance meters. Pace is ${pace / 60} minutes ${pace % 60} seconds"
+            return "Pass $distance meters. Average heartrate is $averageHeartrate"
         }
 
     val infoStr: String
         get() {
-            return "time=${secondsToString(duration)}\ndistance=${distance}\npace=${secondsToString(pace)}\npoints=${points.size}\nsteps=${points.last().steps}"
+            return "time = ${secondsToString(duration)}\n" +
+                    "distance = $distance\n" +
+                    "pace = ${secondsToString(pace)}\n" +
+                    "points = ${points.size}\n" +
+                    "total steps = $totalSteps\n" +
+                    "cadence = $cadence\n" +
+                    "average heartrate = $averageHeartrate\n" +
+                    "current heartrate = $currentHeartrate\n"
         }
     //endregion
 
     //region public methods
-    fun addPoint(location: Location, steps: Int): TrackPoint {
+    fun addPoint(location: Location, steps: Int, heartrate: Int): TrackPoint {
         val point = TrackPoint(
                 Calendar.getInstance().time,
                 location.latitude,
                 location.longitude,
                 location.accuracy.toDouble(),
-                steps
+                steps,
+                heartrate
         )
 
         points.add(point)
@@ -88,6 +118,7 @@ class Track {
             jsonWriter.name("longitude").value(point.longitude)
             jsonWriter.name("accuracy").value(point.accuracy)
             jsonWriter.name("steps").value(point.steps)
+            jsonWriter.name("heartrate").value(point.heartrate)
             jsonWriter.endObject()
         }
         jsonWriter.endArray()
@@ -119,7 +150,7 @@ class Track {
                         val timeStr = (point.getElementsByTagName("time").item(0) as Element).textContent
                         val format = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
                         val time = format.parse(timeStr)
-                        track.points.add(TrackPoint(time!!, latitude, longitude, 0.0, 0))
+                        track.points.add(TrackPoint(time!!, latitude, longitude, 0.0, 0, 0))
                     }
                 }
                 val exerciseInfos = (gpx.getElementsByTagName("exerciseinfo").item(0) as Element).childNodes
@@ -149,7 +180,8 @@ class Track {
                             pointJson.getDouble("latitude"),
                             pointJson.getDouble("longitude"),
                             pointJson.getDouble("accuracy"),
-                            if (pointJson.has("steps")) pointJson.getInt("steps") else 0
+                            if (pointJson.has("steps")) pointJson.getInt("steps") else 0,
+                            if (pointJson.has("heartrate")) pointJson.getInt("heartrate") else 0
                     ))
                 }
                 track

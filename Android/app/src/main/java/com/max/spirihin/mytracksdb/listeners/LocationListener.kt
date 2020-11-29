@@ -8,7 +8,7 @@ import android.location.LocationManager
 import com.max.spirihin.mytracksdb.utilities.Preferences
 import com.max.spirihin.mytracksdb.utilities.Print
 
-class LocationListener(val callback : ((Location) -> Unit)?) : android.location.LocationListener, IListener {
+class LocationListener(private val callback : ((Location) -> Unit)?) : android.location.LocationListener, IListener {
 
     private var locationManager : LocationManager? = null
 

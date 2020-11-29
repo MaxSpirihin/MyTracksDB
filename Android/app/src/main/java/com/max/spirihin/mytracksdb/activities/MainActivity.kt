@@ -22,14 +22,15 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val permissions = arrayOf(
+        val permissions = mutableListOf(
                 Manifest.permission.WRITE_EXTERNAL_STORAGE,
                 Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_BACKGROUND_LOCATION,
-                Manifest.permission.ACTIVITY_RECOGNITION,
-                Manifest.permission.ACCESS_COARSE_LOCATION);
+                Manifest.permission.ACCESS_COARSE_LOCATION)
 
-
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+            permissions.add(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+            permissions.add(Manifest.permission.ACTIVITY_RECOGNITION)
+        }
 
         if (permissions.all { p ->
                     ContextCompat.checkSelfPermission(
@@ -39,7 +40,7 @@ class MainActivity : AppCompatActivity() {
             init()
         } else {
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-                requestPermissions(permissions, 1)
+                requestPermissions(permissions.toTypedArray(), 1)
             }
         }
     }
@@ -73,17 +74,19 @@ class MainActivity : AppCompatActivity() {
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
-        if (requestCode != 1) {
-            Toast.makeText(this, "You should grant all permissions. Restart app and do it", Toast.LENGTH_LONG).show()
+        if (requestCode != 1)
             return
+
+        var missedPermissions = ""
+        for (i in permissions.indices) {
+            if (grantResults[i] != PackageManager.PERMISSION_GRANTED)
+                missedPermissions += permissions[i] + " "
         }
 
-        val granted = grantResults.isNotEmpty() && grantResults.all { res -> res == PackageManager.PERMISSION_GRANTED }
-
-        if (granted) {
+        if (missedPermissions.isNullOrEmpty()) {
             init()
         } else {
-            Toast.makeText(this, "You should grant all permissions. Restart app and do it", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "You should grant all permissions. Restart app and do it. Missed permissions = $missedPermissions", Toast.LENGTH_LONG).show()
         }
     }
 }

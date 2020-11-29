@@ -33,4 +33,15 @@ object Preferences {
                 apply()
             }
         }
+
+    fun getString(key: String, default: String) : String {
+        return sharedPreferences!!.getString(key, default) ?: default
+    }
+
+    fun setString(key: String, value: String) {
+        with (sharedPreferences!!.edit()) {
+            putString(key, value)
+            apply()
+        }
+    }
 }

@@ -6,6 +6,7 @@ import android.content.Intent
 import android.location.Location
 import com.max.spirihin.mytracksdb.services.RecordTrackService
 import com.max.spirihin.mytracksdb.utilities.Print
+import com.wahoofitness.connector.capabilities.Heartrate
 import java.util.*
 
 object TrackRecordManager {
@@ -36,10 +37,10 @@ object TrackRecordManager {
         activity.startService(Intent(activity, RecordTrackService::class.java))
     }
 
-    fun addTrackPoint(location: Location?, steps: Int) {
+    fun addTrackPoint(location: Location?, steps: Int, heartrate: Int) {
         if (!isRecording) return
         if (location == null || track == null) return
-        track!!.addPoint(location, steps)
+        track!!.addPoint(location, steps, heartrate)
         for (listener in mListeners) {
             listener.onReceive(track!!)
         }

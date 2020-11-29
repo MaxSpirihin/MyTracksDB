@@ -6,23 +6,23 @@ import android.content.Intent
 import android.location.Location
 import android.os.Build
 import android.os.IBinder
-import android.speech.tts.TextToSpeech
-import android.widget.Toast
 import androidx.core.app.NotificationCompat
+import com.max.spirihin.mytracksdb.Helpers.TextToSpeechHelper
 import com.max.spirihin.mytracksdb.R
 import com.max.spirihin.mytracksdb.activities.RecordTrackActivity
 import com.max.spirihin.mytracksdb.listeners.StepCounterListener
 import com.max.spirihin.mytracksdb.core.TrackRecordManager
+import com.max.spirihin.mytracksdb.listeners.HeartRateListener
 import com.max.spirihin.mytracksdb.listeners.LocationListener
 import com.max.spirihin.mytracksdb.utilities.Print
-import java.util.*
 
 class RecordTrackService : Service() {
 
-    private var textToSpeech: TextToSpeech? = null//todo move to separate class
+    private var textToSpeech: TextToSpeechHelper? = null
     private var distanceForSpeech : Int = 0
     private var stepCounterListener : StepCounterListener? = null
     private var locationListener : LocationListener? = null
+    private var heartRateListener : HeartRateListener? = null
 
     private var notification: Notification? = null
 
@@ -37,54 +37,44 @@ class RecordTrackService : Service() {
 
         Print.Log("[RecordTrackService] onCreate")
 
-        textToSpeech = TextToSpeech(applicationContext) { status ->
-            if (status == TextToSpeech.SUCCESS) {
-                val ttsLang = textToSpeech!!.setLanguage(Locale.ENGLISH)
-                if (ttsLang == TextToSpeech.LANG_MISSING_DATA
-                        || ttsLang == TextToSpeech.LANG_NOT_SUPPORTED) {
-                    Toast.makeText(applicationContext, "The Language is not supported!", Toast.LENGTH_SHORT).show()
-                }
-            } else {
-                Toast.makeText(applicationContext, "TTS Initialization failed!", Toast.LENGTH_SHORT).show()
-            }
-        }
-
+        textToSpeech = TextToSpeechHelper(applicationContext)
         distanceForSpeech = SPEECH_UPDATE_DISTANCE
         stepCounterListener = StepCounterListener()
+        heartRateListener = HeartRateListener()
         locationListener = LocationListener { location -> onLocationChanged(location) }
     }
 
     @Suppress("DEPRECATION")
     fun onLocationChanged(location: Location) {
-        TrackRecordManager.addTrackPoint(location, stepCounterListener?.stepsCount ?: 0)
+        TrackRecordManager.addTrackPoint(location, stepCounterListener?.stepsCount ?: 0, heartRateListener?.currentHeartrate ?: 0)
         val track = TrackRecordManager.track!!
         updateNotification("Running", "${track.distance}m. | ${track.duration / 60}:${track.duration % 60}")
 
-        if (TrackRecordManager.track!!.distance > distanceForSpeech) {
-            textToSpeech!!.speak(TrackRecordManager.track!!.speechStr, TextToSpeech.QUEUE_FLUSH, null)
+        if (track.distance > distanceForSpeech) {
+            textToSpeech!!.speak(track.speechStr)
             distanceForSpeech += SPEECH_UPDATE_DISTANCE
         }
     }
 
     @SuppressLint("MissingPermission")
-    override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Print.Log("[RecordTrackService] onStartCommand")
         createNotificationChannel()
         updateNotification("Running", "")
 
         locationListener?.startListen(this)
         stepCounterListener?.startListen(this)
+        heartRateListener?.startListen(this)
         return super.onStartCommand(intent, flags, startId)
     }
 
     override fun onDestroy() {
         Print.Log("[RecordTrackService] onDestroy")
 
-        textToSpeech?.stop()
-        textToSpeech?.shutdown()
-
+        textToSpeech?.destroy()
         locationListener?.stopListen()
         stepCounterListener?.stopListen()
+        heartRateListener?.stopListen()
 
         super.onDestroy()
     }
