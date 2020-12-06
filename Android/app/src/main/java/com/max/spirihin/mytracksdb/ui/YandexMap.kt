@@ -12,7 +12,7 @@ import java.util.ArrayList
 
 class YandexMap constructor(private val mapView: MapView){
 
-    private val mapObjects: MapObjectCollection? = mapView.map.mapObjects.addCollection()
+    private val mapObjects: MapObjectCollection = mapView.map.mapObjects.addCollection()
 
     private var isMapZoomed = false
 
@@ -33,21 +33,29 @@ class YandexMap constructor(private val mapView: MapView){
     }
 
     fun showTrack(track: Track?, color: Int, clear: Boolean) {
-        if (track == null) return
+        if (track == null)
+            return
 
-        val polylinePoints = ArrayList<Point>()
-        for (point in track.points) {
-            polylinePoints.add(Point(
-                    point.latitude,
-                    point.longitude)
-            )
+        if (clear)
+            mapObjects.clear()
+
+        for (sector in track.segments) {
+            val polylinePoints = ArrayList<Point>()
+            for (point in sector.points) {
+                polylinePoints.add(Point(
+                        point.latitude,
+                        point.longitude)
+                )
+            }
+
+            val polyline = mapObjects.addPolyline(Polyline(polylinePoints))
+            polyline.strokeColor = color
+            polyline.strokeWidth = 1f
+            polyline.zIndex = 100.0f
+
+            if (track.segments.indexOf(sector) == 0)
+                zoomMap(polylinePoints[0])
         }
-        if (clear) mapObjects!!.clear()
-        val polyline = mapObjects!!.addPolyline(Polyline(polylinePoints))
-        polyline.strokeColor = color
-        polyline.strokeWidth = 1f
-        polyline.zIndex = 100.0f
-        zoomMap(polylinePoints[0])
     }
 
     private fun zoomMap(point: Point) {

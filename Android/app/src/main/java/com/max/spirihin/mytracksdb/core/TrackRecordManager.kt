@@ -3,10 +3,8 @@ package com.max.spirihin.mytracksdb.core
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
-import android.location.Location
 import com.max.spirihin.mytracksdb.services.RecordTrackService
 import com.max.spirihin.mytracksdb.utilities.Print
-import com.wahoofitness.connector.capabilities.Heartrate
 import java.util.*
 
 object TrackRecordManager {
@@ -17,10 +15,14 @@ object TrackRecordManager {
     //endregion
 
     //properties
-    var mListeners = HashSet<ITrackRecordListener>()
+    private var mListeners = HashSet<ITrackRecordListener>()
+    private var mService : RecordTrackService? = null
+
     var track: Track? = null
         private set
     var isRecording = false
+        private set
+    var paused = false
         private set
 
     //endregion
@@ -33,14 +35,31 @@ object TrackRecordManager {
         Print.Log("Start record track")
         track = Track()
 
-        //TODO: check if service is already running
         activity.startService(Intent(activity, RecordTrackService::class.java))
     }
 
-    fun addTrackPoint(location: Location?, steps: Int, heartrate: Int) {
-        if (!isRecording) return
-        if (location == null || track == null) return
-        track!!.addPoint(location, steps, heartrate)
+    fun attachService(service : RecordTrackService){
+        mService = service
+    }
+
+    fun pauseRecording(pause : Boolean) {
+        if (!isRecording || pause == paused)
+            return
+
+        paused = pause
+
+        val lastPoint = mService!!.getLastPoint()
+        if (lastPoint != null)
+            track?.addPoint(lastPoint)
+
+        if (pause)
+            track?.newSegment()
+    }
+
+    fun addTrackPoint(point : TrackPoint) {
+        if (!isRecording || paused) return
+        if (track == null) return
+        track!!.addPoint(point)
         for (listener in mListeners) {
             listener.onReceive(track!!)
         }
@@ -49,6 +68,7 @@ object TrackRecordManager {
     fun stopRecording(activity: Activity) {
         if (!isRecording) return
         isRecording = false
+        mService = null
         activity.stopService(Intent(activity, RecordTrackService::class.java))
     }
 

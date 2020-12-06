@@ -54,11 +54,11 @@ class RecordTrackActivity : AppCompatActivity(), ITrackRecordListener {
                 }
                 RecordState.RECORD -> {
                     updateState(RecordState.PAUSE)
-                    //TODO TrackRecordManager.pauseRecording(this)
+                    TrackRecordManager.pauseRecording(true)
                 }
                 RecordState.PAUSE -> {
                     updateState(RecordState.RECORD)
-                    //TODO TrackRecordManager.resumeRecording(this)
+                    TrackRecordManager.pauseRecording(false)
                 }
             }
         }

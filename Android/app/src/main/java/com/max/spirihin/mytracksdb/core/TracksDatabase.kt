@@ -4,6 +4,7 @@ import android.os.Environment
 import java.io.File
 import java.text.ParseException
 import java.text.SimpleDateFormat
+import kotlin.math.abs
 
 object TracksDatabase {
 
@@ -32,7 +33,7 @@ object TracksDatabase {
 
     fun saveTrack(track: Track) : Int {
         track.id = getNextId();
-        trackFileInStorage(track.id).writeText(track.toJSON())
+        trackFileInStorage(track.id).writeText(TrackParser.toJSON(track))
         return track.id
     }
 
@@ -45,7 +46,7 @@ object TracksDatabase {
         if (!file.exists())
             return null
 
-        return Track.fromJSON(file.nameWithoutExtension.toInt(), file.readText())
+        return TrackParser.fromJSON(file.nameWithoutExtension.toInt(), file.readText())
     }
 
     fun loadAllTracks() : ArrayList<Track> {
@@ -56,7 +57,7 @@ object TracksDatabase {
 
         val result = arrayListOf<Track>()
         File(directoryPath).listFiles().forEach { file ->
-            val track = Track.fromJSON(file.nameWithoutExtension.toInt(), file.readText())
+            val track = TrackParser.fromJSON(file.nameWithoutExtension.toInt(), file.readText())
             if (track != null) {
                 result.add(track)
             }
@@ -69,12 +70,12 @@ object TracksDatabase {
         if (!File(gpxPath).exists())
             return Pair(null, HashMap())
 
-        var files = File(gpxPath).listFiles()
+        val files = File(gpxPath).listFiles()
         for (file in files) {
             try {
                 val dateFromFileName = SimpleDateFormat("yyyyMMdd_hhmmss").parse(file.nameWithoutExtension)
-                if (Math.abs(track.points.first().time.time - dateFromFileName.time) < 60 * 1000) {
-                    return Track.fromGPX(file)
+                if (abs(track.startTime.time - dateFromFileName.time) < 60 * 1000) {
+                    return TrackParser.fromGPX(file)
                 }
             } catch (e : ParseException) {
                 //ignored

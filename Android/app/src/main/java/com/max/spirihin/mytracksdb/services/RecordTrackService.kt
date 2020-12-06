@@ -10,11 +10,13 @@ import androidx.core.app.NotificationCompat
 import com.max.spirihin.mytracksdb.Helpers.TextToSpeechHelper
 import com.max.spirihin.mytracksdb.R
 import com.max.spirihin.mytracksdb.activities.RecordTrackActivity
+import com.max.spirihin.mytracksdb.core.TrackPoint
 import com.max.spirihin.mytracksdb.listeners.StepCounterListener
 import com.max.spirihin.mytracksdb.core.TrackRecordManager
 import com.max.spirihin.mytracksdb.listeners.HeartRateListener
 import com.max.spirihin.mytracksdb.listeners.LocationListener
 import com.max.spirihin.mytracksdb.utilities.Print
+import java.util.*
 
 class RecordTrackService : Service() {
 
@@ -42,11 +44,26 @@ class RecordTrackService : Service() {
         stepCounterListener = StepCounterListener()
         heartRateListener = HeartRateListener()
         locationListener = LocationListener { location -> onLocationChanged(location) }
+        TrackRecordManager.attachService(this)
+    }
+
+    fun getLastPoint() : TrackPoint? {
+        val location = locationListener?.lastLocation ?: return null
+        return TrackPoint(
+                Calendar.getInstance().time,
+                location.latitude,
+                location.longitude,
+                location.accuracy.toDouble(),
+                stepCounterListener?.stepsCount ?: 0,
+                heartRateListener?.currentHeartrate ?: 0
+        )
     }
 
     @Suppress("DEPRECATION")
     fun onLocationChanged(location: Location) {
-        TrackRecordManager.addTrackPoint(location, stepCounterListener?.stepsCount ?: 0, heartRateListener?.currentHeartrate ?: 0)
+        val point = getLastPoint() ?: return
+
+        TrackRecordManager.addTrackPoint(point)
         val track = TrackRecordManager.track!!
         updateNotification("Running", "${track.distance}m. | ${track.duration / 60}:${track.duration % 60}")
 

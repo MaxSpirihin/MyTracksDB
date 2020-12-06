@@ -11,10 +11,13 @@ import com.max.spirihin.mytracksdb.utilities.Print
 class LocationListener(private val callback : ((Location) -> Unit)?) : android.location.LocationListener, IListener {
 
     private var locationManager : LocationManager? = null
+    var lastLocation : Location? = null
+        private set
 
     @Suppress("DEPRECATION")
     override fun onLocationChanged(location: Location) {
         Print.Log("[LocationListener] onLocationChanged ${location.longitude} ${location.latitude} ${location.accuracy}")
+        lastLocation = location
         callback?.invoke(location)
     }
 
