@@ -19,6 +19,7 @@ object TrackParser {
         val jsonWriter = JsonWriter(stringWriter)
         jsonWriter.beginObject() // begin root
         jsonWriter.name("parseVersion").value(2)
+        jsonWriter.name("exerciseType").value(track.exerciseType.toString())
         jsonWriter.name("segments").beginArray()
         for (sector in track.segments) {
             jsonWriter.beginObject()
@@ -43,7 +44,7 @@ object TrackParser {
 
     fun fromGPX(file: File?): Pair<Track?, HashMap<String, String>> {
         return try {
-            val track = Track()
+            val track = Track(ExerciseType.UNKNOWN)
             val params = HashMap<String, String>()
 
             val dbFactory = DocumentBuilderFactory.newInstance()
@@ -89,7 +90,12 @@ object TrackParser {
             if (!jsonRoot.has("parseVersion"))
                 return fromJSONV1(id, jsonRoot)
 
-            val track = Track()
+            val exerciseType =
+                    if (jsonRoot.has("exerciseType"))
+                        ExerciseType.valueOf(jsonRoot.getString("exerciseType"))
+                    else ExerciseType.UNKNOWN
+
+            val track = Track(exerciseType)
             track.id = id
             val segmentsJson = jsonRoot.getJSONArray("segments")
             for (i in 0 until segmentsJson.length()) {
@@ -119,7 +125,7 @@ object TrackParser {
     private fun fromJSONV1(id: Int, jsonRoot: JSONObject): Track? {
         return try {
             val jsonArray = jsonRoot.getJSONArray("Track")
-            val track = Track()
+            val track = Track(ExerciseType.EASY_RUN)//TODO: resave it
             val segment = Segment()
             track.segments.add(segment)
             track.id = id
@@ -139,12 +145,5 @@ object TrackParser {
             Print.LogError(e.toString())
             null
         }
-    }
-
-    private fun secondsToString(seconds: Int): String {
-        val h = seconds / 3600
-        val m = (seconds / 60) % 60
-        val s = seconds % 60
-        return "${if (h > 0) "${String.format("%02d", h)}:" else ""}${String.format("%02d", m)}:${String.format("%02d", s)}"
     }
 }

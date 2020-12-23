@@ -1,11 +1,10 @@
 package com.max.spirihin.mytracksdb.core
 
-import android.location.Location
 import java.util.*
 import com.max.spirihin.mytracksdb.utilities.toShortString
 import kotlin.collections.ArrayList
 
-class Track {
+class Track (val exerciseType : ExerciseType) {
 
     //region attrubutes
     val segments: ArrayList<Segment> = ArrayList()
@@ -54,14 +53,18 @@ class Track {
     val timeStr: String
         get() = startTime.toShortString()
 
+    val speechDistance : Int
+        get() = if (exerciseType == ExerciseType.EASY_RUN) 500 else Int.MAX_VALUE
+
     val speechStr: String
         get() {
-            return "Pass $distance meters. Average heartrate is $averageHeartrate"
+            return "Pass $distance meters." + if (averageHeartrate > 0) "Average heartrate is $averageHeartrate" else ""
         }
 
     val infoStr: String
         get() {
-            return "time = ${secondsToString(duration)}\n" +
+            return "type = ${exerciseType}\n" +
+                    "time = ${secondsToString(duration)}\n" +
                     "distance = $distance\n" +
                     "pace = ${secondsToString(pace)}\n" +
                     "sectors = ${segments.size}\n" +

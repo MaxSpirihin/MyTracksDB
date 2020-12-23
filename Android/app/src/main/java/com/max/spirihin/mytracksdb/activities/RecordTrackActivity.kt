@@ -9,6 +9,7 @@ import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.max.spirihin.mytracksdb.*
+import com.max.spirihin.mytracksdb.core.ExerciseType
 import com.max.spirihin.mytracksdb.core.TrackRecordManager.ITrackRecordListener
 import com.max.spirihin.mytracksdb.core.Track
 import com.max.spirihin.mytracksdb.core.TrackRecordManager
@@ -16,6 +17,10 @@ import com.max.spirihin.mytracksdb.core.TracksDatabase
 import com.max.spirihin.mytracksdb.ui.YandexMap
 
 class RecordTrackActivity : AppCompatActivity(), ITrackRecordListener {
+
+    companion object {
+        const val EXERCISE_TYPE_INTENT_STRING = "exerciseType"
+    }
 
     enum class RecordState {
         NONE,
@@ -50,7 +55,8 @@ class RecordTrackActivity : AppCompatActivity(), ITrackRecordListener {
             when (state) {
                 RecordState.NONE -> {
                     updateState(RecordState.RECORD)
-                    TrackRecordManager.startRecording(this)
+                    val exerciseType = ExerciseType.valueOf(intent.getStringExtra(EXERCISE_TYPE_INTENT_STRING) ?: ExerciseType.UNKNOWN.toString())
+                    TrackRecordManager.startRecording(this, exerciseType)
                 }
                 RecordState.RECORD -> {
                     updateState(RecordState.PAUSE)

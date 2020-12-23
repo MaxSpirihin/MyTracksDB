@@ -14,11 +14,17 @@
         android:minHeight="25px"
         android:orientation="vertical">
 
-    <Button
-        android:id="@+id/btnStartRecording"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Start recording" />
+        <Button
+            android:id="@+id/btnStartEasyRun"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Start easy run" />
+
+        <Button
+            android:id="@+id/btnStartWalking"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Start walking" />
 
         <Button
             android:id="@+id/btnTracksList"

@@ -31,7 +31,6 @@ class RecordTrackService : Service() {
     companion object {
         const val NOTIFICATION_ID = 10
         const val CHANNEL_ID = "RecordTrackService"
-        const val SPEECH_UPDATE_DISTANCE = 500
     }
 
     override fun onCreate() {
@@ -40,7 +39,7 @@ class RecordTrackService : Service() {
         Print.Log("[RecordTrackService] onCreate")
 
         textToSpeech = TextToSpeechHelper(applicationContext)
-        distanceForSpeech = SPEECH_UPDATE_DISTANCE
+        distanceForSpeech = TrackRecordManager.track!!.speechDistance
         stepCounterListener = StepCounterListener()
         heartRateListener = HeartRateListener()
         locationListener = LocationListener { location -> onLocationChanged(location) }
@@ -69,7 +68,7 @@ class RecordTrackService : Service() {
 
         if (track.distance > distanceForSpeech) {
             textToSpeech!!.speak(track.speechStr)
-            distanceForSpeech += SPEECH_UPDATE_DISTANCE
+            distanceForSpeech = track.distance + track.speechDistance
         }
     }
 

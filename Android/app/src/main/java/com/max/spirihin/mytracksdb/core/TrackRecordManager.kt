@@ -29,11 +29,11 @@ object TrackRecordManager {
 
     @SuppressLint("MissingPermission")
     @Throws(Exception::class)
-    fun startRecording(activity: Activity) {
+    fun startRecording(activity: Activity, exerciseType: ExerciseType) {
         if (isRecording) throw Exception("Record is already running. Please call StopRecording")
         isRecording = true
         Print.Log("Start record track")
-        track = Track()
+        track = Track(exerciseType)
 
         activity.startService(Intent(activity, RecordTrackService::class.java))
     }

@@ -10,6 +10,7 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import com.max.spirihin.mytracksdb.utilities.Preferences
 import com.max.spirihin.mytracksdb.R
+import com.max.spirihin.mytracksdb.core.ExerciseType
 import com.max.spirihin.mytracksdb.core.TrackRecordManager
 import com.yandex.mapkit.MapKitFactory
 
@@ -46,8 +47,16 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun init() {
-        findViewById<View>(R.id.btnStartRecording).setOnClickListener {
-            startActivity(RecordTrackActivity::class.java)
+        findViewById<View>(R.id.btnStartEasyRun).setOnClickListener {
+            val intent = Intent(this, RecordTrackActivity::class.java)
+            intent.putExtra(RecordTrackActivity.EXERCISE_TYPE_INTENT_STRING, ExerciseType.EASY_RUN.toString())
+            startActivity(intent)
+        }
+
+        findViewById<View>(R.id.btnStartWalking).setOnClickListener {
+            val intent = Intent(this, RecordTrackActivity::class.java)
+            intent.putExtra(RecordTrackActivity.EXERCISE_TYPE_INTENT_STRING, ExerciseType.WALKING.toString())
+            startActivity(intent)
         }
 
         findViewById<View>(R.id.btnTracksList).setOnClickListener {
