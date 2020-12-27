@@ -57,6 +57,7 @@ object TracksDatabase {
                 .context(mContext!!)
                 .database(mRoomDB!!)
                 .useExternalStorage(true)
+                .maxFileCount(10)
                 .apply {
                     onCompleteListener { success, message ->
                         if (verbose)
@@ -94,7 +95,10 @@ object TracksDatabase {
     }
 
     fun saveTrack(track: Track) : Long {
-       return mDao?.insert(TrackDB.create(track)) ?: 0
+        val id = mDao?.insert(TrackDB.create(track)) ?: 0
+        //before we do not use server backup after every important change
+        backupSqlFile(false)
+        return id
     }
 
     fun deleteTrack(track: Track) {
