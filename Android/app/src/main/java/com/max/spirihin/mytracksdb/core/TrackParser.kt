@@ -84,7 +84,7 @@ object TrackParser {
         }
     }
 
-    fun fromJSON(id: Int, jsonString: String?): Track? {
+    fun fromJSON(id: Long, jsonString: String?): Track? {
         return try {
             val jsonRoot = JSONObject(jsonString ?: return null)
             if (!jsonRoot.has("parseVersion"))
@@ -122,7 +122,7 @@ object TrackParser {
         }
     }
 
-    private fun fromJSONV1(id: Int, jsonRoot: JSONObject): Track? {
+    private fun fromJSONV1(id: Long, jsonRoot: JSONObject): Track? {
         return try {
             val jsonArray = jsonRoot.getJSONArray("Track")
             val track = Track(ExerciseType.EASY_RUN)//TODO: resave it

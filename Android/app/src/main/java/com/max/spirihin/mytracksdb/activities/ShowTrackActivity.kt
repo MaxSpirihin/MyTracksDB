@@ -31,7 +31,7 @@ class ShowTrackActivity : AppCompatActivity() {
         yandexMap = YandexMap(findViewById(R.id.mapview))
         textView = findViewById(R.id.textViewData)
 
-        val id = intent.getIntExtra(TRACK_ID_INTENT_STRING, 0)
+        val id = intent.getLongExtra(TRACK_ID_INTENT_STRING, 0)
         val track = TracksDatabase.loadTrackByID(id)
 
         if (track == null) {

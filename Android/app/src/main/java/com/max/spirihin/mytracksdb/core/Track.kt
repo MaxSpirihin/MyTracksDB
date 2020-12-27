@@ -8,7 +8,7 @@ class Track (val exerciseType : ExerciseType) {
 
     //region attrubutes
     val segments: ArrayList<Segment> = ArrayList()
-    var id: Int = 0
+    var id: Long = 0
 
     private var needNewSegment = false
     //endregion
@@ -17,7 +17,7 @@ class Track (val exerciseType : ExerciseType) {
     val distance: Int
         get() = segments.sumBy { s -> s.distance }
 
-    val startTime: Date
+    val date: Date
         get() = if (segments.size < 1) Date() else segments[0].startTime
 
     /* full duration in seconds */
@@ -50,8 +50,8 @@ class Track (val exerciseType : ExerciseType) {
     val currentHeartrate : Int
         get() = if (segments.isNotEmpty()) segments.last().currentHeartrate else 0
 
-    val timeStr: String
-        get() = startTime.toShortString()
+    val dateStr: String
+        get() = date.toShortString()
 
     val speechDistance : Int
         get() = if (exerciseType == ExerciseType.EASY_RUN) 500 else Int.MAX_VALUE
@@ -64,6 +64,7 @@ class Track (val exerciseType : ExerciseType) {
     val infoStr: String
         get() {
             return "type = ${exerciseType}\n" +
+                    "date = $dateStr\n" +
                     "time = ${secondsToString(duration)}\n" +
                     "distance = $distance\n" +
                     "pace = ${secondsToString(pace)}\n" +

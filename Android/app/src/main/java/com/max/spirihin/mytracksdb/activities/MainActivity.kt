@@ -12,6 +12,7 @@ import com.max.spirihin.mytracksdb.utilities.Preferences
 import com.max.spirihin.mytracksdb.R
 import com.max.spirihin.mytracksdb.core.ExerciseType
 import com.max.spirihin.mytracksdb.core.TrackRecordManager
+import com.max.spirihin.mytracksdb.core.TracksDatabase
 import com.yandex.mapkit.MapKitFactory
 
 class MainActivity : AppCompatActivity() {
@@ -47,6 +48,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun init() {
+        TracksDatabase.init(this)
+
         findViewById<View>(R.id.btnStartEasyRun).setOnClickListener {
             val intent = Intent(this, RecordTrackActivity::class.java)
             intent.putExtra(RecordTrackActivity.EXERCISE_TYPE_INTENT_STRING, ExerciseType.EASY_RUN.toString())
@@ -68,7 +71,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         findViewById<View>(R.id.btnTest).setOnClickListener {
-            startActivity(StepCounterTestActivity::class.java)
+            startActivity(TestActivity::class.java)
         }
 
         if (TrackRecordManager.isRecording && TrackRecordManager.track != null)

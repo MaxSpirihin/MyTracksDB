@@ -35,6 +35,24 @@
             android:layout_height="150px"
             android:inputType="number"
             android:text="1"/>
+
+        <Button
+            android:id="@+id/btnUpdateDB"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="update database"/>
+
+        <Button
+            android:id="@+id/btnBackupDB"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="backup database"/>
+
+        <Button
+            android:id="@+id/btnRestoreDB"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="restore database"/>
     </LinearLayout>
 
 

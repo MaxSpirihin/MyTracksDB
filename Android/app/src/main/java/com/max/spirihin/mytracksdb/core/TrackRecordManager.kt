@@ -66,8 +66,9 @@ object TrackRecordManager {
     }
 
     fun stopRecording(activity: Activity) {
-        if (!isRecording) return
+        if (!isRecording || !paused) return
         isRecording = false
+        paused = false
         mService = null
         activity.stopService(Intent(activity, RecordTrackService::class.java))
     }
