@@ -1,14 +1,10 @@
 package com.max.spirihin.mytracksdb.ui
 
 import android.app.Activity
-import android.content.Context
 import android.location.Location
-import androidx.core.math.MathUtils
 import com.max.spirihin.mytracksdb.R
 import com.max.spirihin.mytracksdb.core.Track
 import com.max.spirihin.mytracksdb.core.TrackPoint
-import com.max.spirihin.mytracksdb.utilities.Print
-import com.max.spirihin.mytracksdb.utilities.Utils
 import com.yandex.mapkit.Animation
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
@@ -17,10 +13,7 @@ import com.yandex.mapkit.map.*
 import com.yandex.mapkit.mapview.MapView
 import com.yandex.runtime.image.ImageProvider
 import java.util.*
-import kotlin.concurrent.schedule
 import kotlin.math.ln
-import kotlin.math.max
-import kotlin.math.min
 
 class YandexMap constructor(private val context: Activity, private val mapView: MapView){
 

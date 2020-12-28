@@ -8,6 +8,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
+import com.garmin.fit.Bool
 import com.max.spirihin.mytracksdb.Helpers.TextToSpeechHelper
 import com.max.spirihin.mytracksdb.R
 import com.max.spirihin.mytracksdb.activities.RecordTrackActivity
@@ -48,7 +49,7 @@ object TrackRecordManager {
         updateNotification("Running", "")
     }
 
-    fun startListen(context: Context) {
+    fun startListen(context: Context, useTestService : Boolean) {
         if (recordState != RecordState.NONE)
             throw Exception("Cant start listen from state $recordState")
 
@@ -56,8 +57,10 @@ object TrackRecordManager {
         recordState = RecordState.LISTEN
 
         //start points provider service
-        // context.startService(Intent(context, RecordTrackService::class.java))
-        context.startService(Intent(context, ReplayTrackService::class.java))
+        if (useTestService)
+            context.startService(Intent(context, ReplayTrackService::class.java))
+        else
+            context.startService(Intent(context, RecordTrackService::class.java))
     }
 
     fun stopListen(context: Context) {

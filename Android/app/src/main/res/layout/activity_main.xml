@@ -7,42 +7,12 @@
     tools:context=".activities.MainActivity">
 
     <LinearLayout
-        android:id="@+id/linLayoutLog"
+        android:id="@+id/linLayoutMain"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:minWidth="25px"
         android:minHeight="25px"
         android:orientation="vertical">
-
-        <Button
-            android:id="@+id/btnStartEasyRun"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Start easy run" />
-
-        <Button
-            android:id="@+id/btnStartWalking"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Start walking" />
-
-        <Button
-            android:id="@+id/btnTracksList"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Tracks list" />
-
-        <Button
-            android:id="@+id/btnSettings"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="settings" />
-
-        <Button
-            android:id="@+id/btnTest"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="test" />
 
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

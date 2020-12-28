@@ -17,6 +17,7 @@ class RecordTrackActivity : AppCompatActivity() {
 
     companion object {
         const val EXERCISE_TYPE_INTENT_STRING = "exerciseType"
+        const val USE_TEST_SERVICE_INTENT_STRING = "useTestService"
     }
 
     private var textView: TextView? = null
@@ -102,7 +103,7 @@ class RecordTrackActivity : AppCompatActivity() {
         super.onResume()
 
         if (TrackRecordManager.recordState == RecordState.NONE)
-            TrackRecordManager.startListen(this)
+            TrackRecordManager.startListen(this, intent.getBooleanExtra(USE_TEST_SERVICE_INTENT_STRING, false))
 
         TrackRecordManager.subscribe(::onCurrentPointChanged)
 

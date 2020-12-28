@@ -6,6 +6,8 @@ import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import com.max.spirihin.mytracksdb.utilities.Preferences
@@ -17,6 +19,9 @@ import com.max.spirihin.mytracksdb.core.TracksDatabase
 import com.yandex.mapkit.MapKitFactory
 
 class MainActivity : AppCompatActivity() {
+
+    private var mLinearLayout : LinearLayout? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         MapKitFactory.setApiKey("0e9fede4-9954-4e61-b193-66191985d75d")
         MapKitFactory.initialize(this)
@@ -51,32 +56,54 @@ class MainActivity : AppCompatActivity() {
     private fun init() {
         TracksDatabase.init(this)
 
-        findViewById<View>(R.id.btnStartEasyRun).setOnClickListener {
+        mLinearLayout = findViewById<LinearLayout>(R.id.linLayoutMain)
+
+        addButton("EASY RUN") {
             val intent = Intent(this, RecordTrackActivity::class.java)
             intent.putExtra(RecordTrackActivity.EXERCISE_TYPE_INTENT_STRING, ExerciseType.EASY_RUN.toString())
             startActivity(intent)
         }
 
-        findViewById<View>(R.id.btnStartWalking).setOnClickListener {
+        addButton("WALKING") {
             val intent = Intent(this, RecordTrackActivity::class.java)
             intent.putExtra(RecordTrackActivity.EXERCISE_TYPE_INTENT_STRING, ExerciseType.WALKING.toString())
             startActivity(intent)
         }
 
-        findViewById<View>(R.id.btnTracksList).setOnClickListener {
+        addButton("SKATES") {
+            val intent = Intent(this, RecordTrackActivity::class.java)
+            intent.putExtra(RecordTrackActivity.EXERCISE_TYPE_INTENT_STRING, ExerciseType.SKATES.toString())
+            startActivity(intent)
+        }
+
+        addButton("TEST RECORD") {
+            val intent = Intent(this, RecordTrackActivity::class.java)
+            intent.putExtra(RecordTrackActivity.EXERCISE_TYPE_INTENT_STRING, ExerciseType.EASY_RUN.toString())
+            intent.putExtra(RecordTrackActivity.USE_TEST_SERVICE_INTENT_STRING, true)
+            startActivity(intent)
+        }
+
+        addButton("TRACKS LIST") {
             startActivity(TracksListActivity::class.java)
         }
 
-        findViewById<View>(R.id.btnSettings).setOnClickListener {
+        addButton("SETTINGS") {
             startActivity(SettingsActivity::class.java)
         }
 
-        findViewById<View>(R.id.btnTest).setOnClickListener {
+        addButton("TEST") {
             startActivity(TestActivity::class.java)
         }
 
         if (TrackRecordManager.recordState != RecordState.NONE)
             startActivity(RecordTrackActivity::class.java)
+    }
+
+    private fun addButton(text : String, action : () -> Unit) {
+        val button = Button(this)
+        button.text = text
+        button.setOnClickListener{ action?.invoke()}
+        mLinearLayout?.addView(button)
     }
 
     private fun startActivity(cls: Class<*>) {
