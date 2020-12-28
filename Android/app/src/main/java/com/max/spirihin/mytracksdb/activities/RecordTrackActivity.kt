@@ -112,7 +112,9 @@ class RecordTrackActivity : AppCompatActivity(), ITrackRecordListener {
     }
 
     override fun onReceive(track: Track) {
-        updateText(track)
-        yandexMap!!.showTrack(track, Color.BLUE, true)
+        runOnUiThread {
+            updateText(track)
+            yandexMap!!.showTrack(track, Color.BLUE, true)
+        }
     }
 }

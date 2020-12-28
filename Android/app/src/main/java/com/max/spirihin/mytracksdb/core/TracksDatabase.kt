@@ -97,7 +97,7 @@ object TracksDatabase {
     fun saveTrack(track: Track) : Long {
         val id = mDao?.insert(TrackDB.create(track)) ?: 0
         //before we do not use server backup after every important change
-        backupSqlFile(false)
+        backupSqlFile(true)
         return id
     }
 
