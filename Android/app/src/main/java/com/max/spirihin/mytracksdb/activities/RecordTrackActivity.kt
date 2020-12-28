@@ -31,7 +31,7 @@ class RecordTrackActivity : AppCompatActivity() {
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_record_track)
-        yandexMap = YandexMap(findViewById(R.id.mapview))
+        yandexMap = YandexMap(this, findViewById(R.id.mapview))
 
         textView = findViewById(R.id.textViewData)
 
@@ -138,6 +138,7 @@ class RecordTrackActivity : AppCompatActivity() {
 
     private fun onCurrentPointChanged() {
         runOnUiThread {
+            yandexMap!!.showCurrentPosition(TrackRecordManager.getLastPoint())
             val track = TrackRecordManager.track ?: return@runOnUiThread
             updateText(track)
             yandexMap!!.showTrack(track, Color.BLUE)

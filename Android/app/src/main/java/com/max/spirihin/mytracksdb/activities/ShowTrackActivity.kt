@@ -28,7 +28,7 @@ class ShowTrackActivity : AppCompatActivity() {
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_show_track)
-        yandexMap = YandexMap(findViewById(R.id.mapview))
+        yandexMap = YandexMap(this, findViewById(R.id.mapview))
         textView = findViewById(R.id.textViewData)
 
         val id = intent.getLongExtra(TRACK_ID_INTENT_STRING, 0)
@@ -40,7 +40,7 @@ class ShowTrackActivity : AppCompatActivity() {
         }
 
         textView!!.text = track.infoStr
-        yandexMap!!.showTrack(track, Color.BLUE, true)
+        yandexMap!!.showTrack(track, Color.BLUE)
 
         var gpxLoaded = false
         (findViewById<Button>(R.id.btnLoadGPX)).setOnClickListener {
@@ -58,7 +58,7 @@ class ShowTrackActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            yandexMap!!.showTrack(trackFromGPX, Color.RED, false)
+            yandexMap!!.showTrack(trackFromGPX, Color.RED)
             var text = textView!!.text.toString() + "\n\nFrom GPX\n${trackFromGPX.infoStr}\n"
             for (kvp in gpxParams)
                 text += "${kvp.key}=${kvp.value}\n"
