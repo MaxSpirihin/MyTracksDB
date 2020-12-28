@@ -29,10 +29,8 @@
         <activity android:name=".activities.TracksListActivity" />
         <activity android:name=".activities.SettingsActivity" />
 
-        <service
-            android:name=".services.RecordTrackService"
-            android:enabled="true"
-            android:exported="true" />
+        <service  android:name=".services.RecordTrackService" android:enabled="true" android:exported="true" />
+        <service  android:name=".services.ReplayTrackService" android:enabled="true" android:exported="true" />
 
         <activity android:name=".activities.RecordTrackActivity" />
         <activity android:name=".activities.ShowTrackActivity" />
