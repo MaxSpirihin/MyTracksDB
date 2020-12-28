@@ -86,6 +86,8 @@ class Track (val exerciseType : ExerciseType) {
         if (segments.size == 0 || needNewSegment)
             segments.add(Segment())
 
+        needNewSegment = false
+
         segments.last().points.add(point)
     }
     //endregion
