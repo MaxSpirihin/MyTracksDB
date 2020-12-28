@@ -1,6 +1,5 @@
 package com.max.spirihin.mytracksdb.core
 
-import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -19,44 +18,27 @@ import com.max.spirihin.mytracksdb.utilities.Print
 import java.util.*
 
 object TrackRecordManager {
-    //region nested types
-    interface ITrackRecordListener {
-        fun onReceive(track: Track)
-    }
-    //endregion
-
+    //region constants
     const val NOTIFICATION_ID = 10
     const val CHANNEL_ID = "RecordTrackService"
+    //endregion
 
-    //properties
+    //region attributes
     private var mDistanceForSpeech : Int = 0
-    private var mListeners = HashSet<ITrackRecordListener>()
+    private var mObservers = HashSet<() -> Unit>()
     private var mService : TrackPointsProviderService? = null
     private var mTextToSpeech: TextToSpeechHelper? = null
     private var mNotification: Notification? = null
-
-    var track: Track? = null
-        private set
-    var isRecording = false
-        private set
-    var paused = false
-        private set
-
     //endregion
 
-    @SuppressLint("MissingPermission")
-    @Throws(Exception::class)
-    fun startRecording(context: Context, exerciseType: ExerciseType) {
-        if (isRecording) throw Exception("Record is already running. Please call StopRecording")
-        isRecording = true
-        Print.Log("Start record track")
-        track = Track(exerciseType)
-        mTextToSpeech = TextToSpeechHelper(context.applicationContext)
-        mDistanceForSpeech = track!!.speechDistance
-        context.startService(Intent(context, RecordTrackService::class.java))
-        //context.startService(Intent(context, ReplayTrackService::class.java))
-    }
+    //region properties
+    var track: Track? = null
+        private set
+    var recordState = RecordState.NONE
+        private set
+    //endregion
 
+    //region public methods
     fun attachPointsProvider(service : TrackPointsProviderService){
         if (mService != null)
             throw java.lang.Exception("TrackRecordManager already has points provider")
@@ -66,32 +48,111 @@ object TrackRecordManager {
         updateNotification("Running", "")
     }
 
+    fun startListen(context: Context) {
+        if (recordState != RecordState.NONE)
+            throw Exception("Cant start listen from state $recordState")
+
+        Print.Log("Start listen location")
+        recordState = RecordState.LISTEN
+
+        //start points provider service
+        // context.startService(Intent(context, RecordTrackService::class.java))
+        context.startService(Intent(context, ReplayTrackService::class.java))
+    }
+
+    fun stopListen(context: Context) {
+        if (recordState != RecordState.LISTEN)
+            throw Exception("Cant stop listen from state $recordState")
+
+        Print.Log("Stop listen location")
+        recordState = RecordState.NONE
+        destroyService(context)
+    }
+
+    fun startRecording(context: Context, exerciseType: ExerciseType) {
+        if (recordState != RecordState.LISTEN)
+            throw Exception("Cant start recording from state $recordState")
+
+        Print.Log("Start record track")
+        recordState = RecordState.RECORD
+        track = Track(exerciseType)
+        mTextToSpeech = TextToSpeechHelper(context.applicationContext)
+        mDistanceForSpeech = track!!.speechDistance
+    }
+
     fun getLastPoint() : TrackPoint? {
         return mService?.getCurrentPoint()
     }
 
-    fun pauseRecording(pause : Boolean) {
-        if (!isRecording || pause == paused)
-            return
+    fun pauseRecording() {
+        if (recordState != RecordState.RECORD)
+            throw Exception("Cant pause recording from state $recordState")
 
-        paused = pause
+        Print.Log("Pause record")
+        recordState = RecordState.PAUSE
 
-        val lastPoint = mService!!.getCurrentPoint()
-        if (lastPoint != null)
-            track?.addPoint(lastPoint)
+        val currentPoint = mService!!.getCurrentPoint()
+        if (currentPoint != null)
+            track?.addPoint(currentPoint)
 
-        if (pause)
-            track?.newSegment()
+        track?.newSegment()
+    }
+
+    fun resumeRecording() {
+        if (recordState != RecordState.PAUSE)
+            throw Exception("Cant resume recording from state $recordState")
+
+        Print.Log("Resume record")
+        recordState = RecordState.RECORD
+
+        val currentPoint = mService!!.getCurrentPoint()
+        if (currentPoint != null)
+            track?.addPoint(currentPoint)
+    }
+
+    fun stopRecording(context: Context, saveTrack: Boolean) : Track? {
+        if (recordState != RecordState.PAUSE)
+            throw Exception("Cant stop recording from state $recordState")
+
+        val track = TrackRecordManager.track ?: return null
+
+        if (saveTrack)
+            track.id = TracksDatabase.saveTrack(track)
+
+        Print.Log("Stop record")
+        recordState = RecordState.NONE
+
+        mTextToSpeech?.destroy()
+        destroyService(context)
+        TrackRecordManager.track = null
+
+        return track
+    }
+
+    fun subscribe(observer : () -> Unit) {
+        mObservers.add(observer)
+    }
+
+    fun unsubscribe(observer : () -> Unit) {
+        mObservers.remove(observer)
+    }
+    //endregion
+
+    private fun destroyService(context: Context){
+        mService?.unsubscribe(::onCurrentPointChanged)
+        mService?.destroy(context)
+        mService = null
     }
 
     private fun onCurrentPointChanged(point : TrackPoint) {
-        if (!isRecording || paused) return
-        if (track == null) return
-        track!!.addPoint(point)
-
-        for (listener in mListeners) {
-            listener.onReceive(track!!)
+        for (observer in mObservers) {
+            observer?.invoke()
         }
+
+        if (recordState != RecordState.RECORD || track == null)
+            return
+
+        track!!.addPoint(point)
 
         if (track!!.distance > mDistanceForSpeech) {
             mTextToSpeech!!.speak(track!!.speechStr)
@@ -100,25 +161,6 @@ object TrackRecordManager {
 
         updateNotification("Running", "${track!!.distance}m. | ${track!!.duration / 60}:${track!!.duration % 60}")
     }
-
-    fun stopRecording(context: Context) {
-        if (!isRecording || !paused) return
-        isRecording = false
-        paused = false
-        mTextToSpeech?.destroy()
-        mService?.unsubscribe(::onCurrentPointChanged)
-        mService?.destroy(context)
-        mService = null
-    }
-
-    fun registerListener(listener: ITrackRecordListener) {
-        mListeners.add(listener)
-    }
-
-    fun unregisterListener(listener: ITrackRecordListener?) {
-        mListeners.remove(listener)
-    }
-    //endregion
 
     private fun updateNotification(title: String, text: String) {
         val service = mService ?: return

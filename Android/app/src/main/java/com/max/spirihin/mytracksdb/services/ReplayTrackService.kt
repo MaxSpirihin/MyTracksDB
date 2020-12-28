@@ -34,7 +34,7 @@ class ReplayTrackService : TrackPointsProviderService() {
             mAllPoints.addAll(segment.points)
         }
 
-        Timer().schedule(0, 500) {
+        Timer().schedule(0, 100) {
             moveToNext()
         }
     }

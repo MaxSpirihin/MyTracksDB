@@ -36,7 +36,14 @@
                     android:layout_width="0dp"
                     android:layout_height="150px"
                     android:layout_weight=".5"
-                    android:text="stop" />
+                    android:text="save" />
+
+                <Button
+                    android:id="@+id/btnStopNoSave"
+                    android:layout_width="0dp"
+                    android:layout_height="150px"
+                    android:layout_weight=".5"
+                    android:text="exit" />
             </LinearLayout>
 
             <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"

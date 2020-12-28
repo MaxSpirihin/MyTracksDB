@@ -11,6 +11,7 @@ import androidx.core.content.ContextCompat
 import com.max.spirihin.mytracksdb.utilities.Preferences
 import com.max.spirihin.mytracksdb.R
 import com.max.spirihin.mytracksdb.core.ExerciseType
+import com.max.spirihin.mytracksdb.core.RecordState
 import com.max.spirihin.mytracksdb.core.TrackRecordManager
 import com.max.spirihin.mytracksdb.core.TracksDatabase
 import com.yandex.mapkit.MapKitFactory
@@ -74,7 +75,7 @@ class MainActivity : AppCompatActivity() {
             startActivity(TestActivity::class.java)
         }
 
-        if (TrackRecordManager.isRecording && TrackRecordManager.track != null)
+        if (TrackRecordManager.recordState != RecordState.NONE)
             startActivity(RecordTrackActivity::class.java)
     }
 

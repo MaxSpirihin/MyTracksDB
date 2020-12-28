@@ -7,32 +7,23 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.max.spirihin.mytracksdb.*
-import com.max.spirihin.mytracksdb.core.ExerciseType
-import com.max.spirihin.mytracksdb.core.TrackRecordManager.ITrackRecordListener
-import com.max.spirihin.mytracksdb.core.Track
-import com.max.spirihin.mytracksdb.core.TrackRecordManager
-import com.max.spirihin.mytracksdb.core.TracksDatabase
+import com.max.spirihin.mytracksdb.core.*
 import com.max.spirihin.mytracksdb.ui.YandexMap
 
-class RecordTrackActivity : AppCompatActivity(), ITrackRecordListener {
+class RecordTrackActivity : AppCompatActivity() {
 
     companion object {
         const val EXERCISE_TYPE_INTENT_STRING = "exerciseType"
-    }
-
-    enum class RecordState {
-        NONE,
-        RECORD,
-        PAUSE
     }
 
     private var textView: TextView? = null
 
     private var btnStart: Button? = null
     private var btnStop: Button? = null
-    private var state: RecordState = RecordState.NONE
+    private var btnStopNoSave: Button? = null
     private var yandexMap : YandexMap? = null
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -46,75 +37,110 @@ class RecordTrackActivity : AppCompatActivity(), ITrackRecordListener {
 
         btnStart = findViewById(R.id.btnStart)
         btnStop = findViewById(R.id.btnStop)
-
-        updateState(if (TrackRecordManager.isRecording) RecordState.RECORD else RecordState.NONE)
-        if (TrackRecordManager.isRecording && TrackRecordManager.track != null)
-            onReceive(TrackRecordManager.track!!)
+        btnStopNoSave = findViewById(R.id.btnStopNoSave)
 
         btnStart!!.setOnClickListener {
-            when (state) {
-                RecordState.NONE -> {
-                    updateState(RecordState.RECORD)
-                    val exerciseType = ExerciseType.valueOf(intent.getStringExtra(EXERCISE_TYPE_INTENT_STRING) ?: ExerciseType.UNKNOWN.toString())
-                    TrackRecordManager.startRecording(this, exerciseType)
-                }
+            when (TrackRecordManager.recordState) {
                 RecordState.RECORD -> {
-                    updateState(RecordState.PAUSE)
-                    TrackRecordManager.pauseRecording(true)
+                    TrackRecordManager.pauseRecording()
                 }
                 RecordState.PAUSE -> {
-                    updateState(RecordState.RECORD)
-                    TrackRecordManager.pauseRecording(false)
+                    TrackRecordManager.resumeRecording()
+                }
+                else -> {
+                    val exerciseType = ExerciseType.valueOf(
+                            intent.getStringExtra(EXERCISE_TYPE_INTENT_STRING)
+                                    ?: ExerciseType.UNKNOWN.toString()
+                    )
+                    TrackRecordManager.startRecording(this, exerciseType)
                 }
             }
+            updateState()
         }
         btnStop!!.setOnClickListener {
-            if (state != RecordState.PAUSE)
+            if (TrackRecordManager.recordState != RecordState.PAUSE)
                 return@setOnClickListener
 
-            TrackRecordManager.stopRecording(this)
-            val track = TrackRecordManager.track ?: return@setOnClickListener
-            val id = TracksDatabase.saveTrack(track)
+            val track = TrackRecordManager.stopRecording(this, true)
 
-            val intent = Intent(this, ShowTrackActivity::class.java)
-            intent.putExtra(ShowTrackActivity.TRACK_ID_INTENT_STRING, id)
-            startActivity(intent)
+            if (track != null) {
+                val intent = Intent(this, ShowTrackActivity::class.java)
+                intent.putExtra(ShowTrackActivity.TRACK_ID_INTENT_STRING, track.id)
+                startActivity(intent)
+            }
+
             finish()
+        }
+
+        btnStopNoSave!!.setOnClickListener {
+            if (TrackRecordManager.recordState != RecordState.PAUSE)
+                return@setOnClickListener
+
+            AlertDialog.Builder(this)
+                    .setTitle("Exit without save?")
+                    .setMessage("Do you really to exit without saving track? Data will be lost")
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setPositiveButton(android.R.string.ok) { _, _ ->
+                        TrackRecordManager.stopRecording(this, false)
+                        finish()
+                    }
+                    .setNegativeButton(android.R.string.cancel, null).show()
         }
     }
 
     override fun onStop() {
         yandexMap!!.onStop()
-        TrackRecordManager.unregisterListener(this)
         super.onStop()
     }
 
     override fun onStart() {
         super.onStart()
-        TrackRecordManager.registerListener(this)
         yandexMap!!.onStart()
     }
 
-    private fun updateState(newState : RecordState) {
-        state = newState
+    override fun onResume() {
+        super.onResume()
 
+        if (TrackRecordManager.recordState == RecordState.NONE)
+            TrackRecordManager.startListen(this)
+
+        TrackRecordManager.subscribe(::onCurrentPointChanged)
+
+        updateState()
+        onCurrentPointChanged()
+    }
+
+    override fun onPause() {
+        super.onPause()
+
+        if (TrackRecordManager.recordState == RecordState.LISTEN)
+            TrackRecordManager.stopListen(this)
+
+        TrackRecordManager.unsubscribe(::onCurrentPointChanged)
+    }
+
+    private fun updateState() {
+
+        val state = TrackRecordManager.recordState
         btnStart!!.text = when (state) {
-            RecordState.NONE -> "start"
             RecordState.RECORD -> "pause"
             RecordState.PAUSE -> "resume"
+            else -> "start"
         }
 
         btnStop!!.isEnabled = state == RecordState.PAUSE
+        btnStopNoSave!!.isEnabled = state == RecordState.PAUSE
     }
 
     private fun updateText(track: Track) {
         textView!!.text = track.infoStr
     }
 
-    override fun onReceive(track: Track) {
+    private fun onCurrentPointChanged() {
         runOnUiThread {
+            val track = TrackRecordManager.track ?: return@runOnUiThread
             updateText(track)
-            yandexMap!!.showTrack(track, Color.BLUE, true)
+            yandexMap!!.showTrack(track, Color.BLUE)
         }
     }
 }
