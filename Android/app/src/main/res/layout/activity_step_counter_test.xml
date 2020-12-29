@@ -11,4 +11,15 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:text="" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvTracks"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:layout_editor_absoluteX="7dp"
+        tools:layout_editor_absoluteY="4dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        />
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>
