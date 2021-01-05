@@ -76,6 +76,12 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        addButton("SKIING") {
+            val intent = Intent(this, RecordTrackActivity::class.java)
+            intent.putExtra(RecordTrackActivity.EXERCISE_TYPE_INTENT_STRING, ExerciseType.SKIING.toString())
+            startActivity(intent)
+        }
+
         addButton("TEST RECORD") {
             val intent = Intent(this, RecordTrackActivity::class.java)
             intent.putExtra(RecordTrackActivity.EXERCISE_TYPE_INTENT_STRING, ExerciseType.EASY_RUN.toString())
