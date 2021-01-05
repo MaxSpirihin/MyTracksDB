@@ -105,14 +105,19 @@ object TrackParser {
                 val pointsJson = segmentJson.getJSONArray("points")
                 for (i in 0 until pointsJson.length()) {
                     val pointJson = pointsJson.getJSONObject(i)
-                    segment.points.add(TrackPoint(
+                    val point = TrackPoint(
                             Date(pointJson.getLong("date")),
                             pointJson.getDouble("latitude"),
                             pointJson.getDouble("longitude"),
                             pointJson.getDouble("accuracy"),
                             if (pointJson.has("steps")) pointJson.getInt("steps") else 0,
                             if (pointJson.has("heartrate")) pointJson.getInt("heartrate") else 0
-                    ))
+                    )
+
+                    //TODO: move this condition somewhere else
+                    //ignore points with gps mistakes
+                    if (point.accuracy < 20)
+                        segment.points.add(point)
                 }
             }
             track

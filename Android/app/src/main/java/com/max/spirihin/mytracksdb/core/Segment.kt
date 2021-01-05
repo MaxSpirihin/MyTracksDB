@@ -51,5 +51,8 @@ class Segment {
     val currentHeartrate : Int
         get() = if (points.isNotEmpty()) points.last().heartrate else 0
 
+    val maxHeartrate : Int
+        get() = if (points.isNotEmpty()) points.map { p -> p.heartrate }.max() ?: 0 else 0
+
     //endregion
 }

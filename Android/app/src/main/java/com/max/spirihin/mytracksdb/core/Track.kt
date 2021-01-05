@@ -47,6 +47,9 @@ class Track (val exerciseType : ExerciseType) {
             return if (totalDuration > 0) totalHeartrateXDuration / totalDuration else 0
         }
 
+    val maxHeartrate : Int
+        get() = if (segments.isNotEmpty()) segments.map { p -> p.maxHeartrate }.max() ?: 0 else 0
+
     val currentHeartrate : Int
         get() = if (segments.isNotEmpty()) segments.last().currentHeartrate else 0
 
@@ -63,7 +66,7 @@ class Track (val exerciseType : ExerciseType) {
 
     val infoStr: String
         get() {
-            return "type = ${exerciseType}\n" +
+            var str = "type = ${exerciseType}\n" +
                     "date = $dateStr\n" +
                     "time = ${secondsToString(duration)}\n" +
                     "distance = $distance\n" +
@@ -73,7 +76,26 @@ class Track (val exerciseType : ExerciseType) {
                     "total steps = $totalSteps\n" +
                     "cadence = $cadence\n" +
                     "average heartrate = $averageHeartrate\n" +
+                    "max heartrate = $maxHeartrate\n" +
                     "current heartrate = $currentHeartrate\n"
+
+            val errPoints = mutableListOf<TrackPoint>()
+            for (segment in segments) {
+                for (point in segment.points) {
+                    if (point.accuracy > 50) {
+                        errPoints.add(point)
+                    }
+                }
+            }
+
+            if (errPoints.size > 0) {
+                str += "errors "
+                for (point in errPoints) {
+                    str += String.format("%02f", point.accuracy) + " "
+                }
+            }
+
+            return str
         }
     //endregion
 
@@ -90,6 +112,7 @@ class Track (val exerciseType : ExerciseType) {
 
         segments.last().points.add(point)
     }
+
     //endregion
 
     companion object {
