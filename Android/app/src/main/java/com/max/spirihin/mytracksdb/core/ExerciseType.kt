@@ -6,5 +6,6 @@ enum class ExerciseType {
     CONTROL_RUN,
     WALKING,
     BICYCLE,
-    SKATES
+    SKATES,
+    SKIING
 }

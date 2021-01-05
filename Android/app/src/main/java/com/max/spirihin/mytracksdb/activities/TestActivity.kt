@@ -139,7 +139,8 @@ class CustomAdapter(private val objects: List<Any>, private val onItemClicked : 
         when (viewHolder.getItemViewType()) {
             0 -> {
                 val viewHolderItem = viewHolder as ViewHolderItem
-                viewHolderItem.textView.text = (objects[position] as TestActivity.TrackItem).track.distance.toString()
+                val distanceInKM = (objects[position] as TestActivity.TrackItem).track.distance / 1000.0
+                viewHolderItem.textView.text = "%.2f".format(distanceInKM) + " km"
             }
             1 -> {
                 val viewHolderMonth = viewHolder as ViewHolderMonth
