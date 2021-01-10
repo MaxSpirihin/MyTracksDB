@@ -80,10 +80,13 @@ class Track (val exerciseType : ExerciseType) {
                     "sectors = ${segments.size}\n" +
                     "points = ${segments.sumBy { s -> s.points.size }}\n" +
                     "total steps = $totalSteps\n" +
-                    "cadence = $cadence\n" +
-                    "average heartrate = $averageHeartrate\n" +
-                    "max heartrate = $maxHeartrate\n" +
-                    "current heartrate = $currentHeartrate\n"
+                    "cadence = $cadence\n"
+
+            if (averageHeartrate > 0) {
+                str += "average heartrate = $averageHeartrate\n" +
+                        "max heartrate = $maxHeartrate\n" +
+                        "current heartrate = $currentHeartrate\n"
+            }
 
             val errPoints = mutableListOf<TrackPoint>()
             for (segment in segments) {
@@ -104,8 +107,8 @@ class Track (val exerciseType : ExerciseType) {
             for (segment in segments) {
                 for (i in 0..(segment.distance / 1000)) {
                     val start = i * 1000
-                    val end = min(i * 1000, segment.distance)
-                    str += "${end / 1000.0} - ${secondsToString((1000 / segment.getSpeedAtRange(start, end)).toInt())}\n"
+                    val end = min((i + 1) * 1000, segment.distance)
+                    str += "${end / 1000.0} - ${Utils.paceToString((1000 / segment.getSpeedAtRange(start, end)).toInt())}\n"
                 }
             }
 
