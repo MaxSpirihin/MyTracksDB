@@ -4,18 +4,22 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activities.TracksListActivity">
+    tools:context=".activities.StepCounterTestActivity">
 
-    <LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
+    <TextView
+        android:id="@+id/tvTest"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
-        <ListView
-            android:id="@+id/lvTracksList"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-        </ListView>
-    </LinearLayout>
+        android:text="" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvTracks"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:layout_editor_absoluteX="7dp"
+        tools:layout_editor_absoluteY="4dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

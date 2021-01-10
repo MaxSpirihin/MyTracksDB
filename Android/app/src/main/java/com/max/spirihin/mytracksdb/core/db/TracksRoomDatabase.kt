@@ -6,7 +6,7 @@ import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
-@Database(entities = arrayOf(Track::class), version = 5)
+@Database(entities = arrayOf(Track::class), version = 6)
 @TypeConverters(Converters::class)
 abstract class TracksRoomDatabase : RoomDatabase() {
     abstract fun dao(): TrackDao
@@ -23,6 +23,11 @@ abstract class TracksRoomDatabase : RoomDatabase() {
                         database.execSQL("ALTER TABLE track ADD COLUMN distance INTEGER NOT NULL DEFAULT (0)")
                         database.execSQL("ALTER TABLE track ADD COLUMN duration INTEGER NOT NULL DEFAULT (0)")
                         database.execSQL("ALTER TABLE track ADD COLUMN exercise_type NVARCHAR(50) NOT NULL default('')")
+                    }
+                },
+                object : Migration(5, 6) {
+                    override fun migrate(database: SupportSQLiteDatabase) {
+                        database.execSQL("ALTER TABLE track ADD COLUMN pace INTEGER NOT NULL DEFAULT (0)")
                     }
                 }
         )

@@ -1,14 +1,43 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginBottom="10dp"
     android:gravity="center_vertical">
+
+    <ImageView
+        android:id="@+id/imageView5"
+        android:layout_width="match_parent"
+        android:layout_height="8dp"
+        android:background="#E9E9E9"
+        android:scaleType="fitXY"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvPace" />
 
     <TextView
         android:id="@+id/tvMonth"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="10dp"
         android:text="DECEMBER"
         android:textAlignment="center"
-        android:textSize="24sp"
-        android:textStyle="bold" />
-</FrameLayout>
+        android:textColor="#000000"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageView5" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="25dp"
+        android:layout_height="17dp"
+        android:layout_marginEnd="10dp"
+        android:rotation="90"
+        app:layout_constraintBottom_toBottomOf="@+id/tvMonth"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tvMonth"
+        app:srcCompat="@drawable/arrow" />
+</androidx.constraintlayout.widget.ConstraintLayout>

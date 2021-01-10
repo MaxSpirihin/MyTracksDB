@@ -5,6 +5,10 @@ import java.text.SimpleDateFormat
 import java.util.Date
 
 fun Date.toShortString(): String {
-    val dateFormat: DateFormat = SimpleDateFormat("dd.MM - hh:mm:ss")
+    return this.toStringFormat("dd.MM - hh:mm:ss")
+}
+
+fun Date.toStringFormat(format: String): String {
+    val dateFormat: DateFormat = SimpleDateFormat(format)
     return dateFormat.format(this)
 }

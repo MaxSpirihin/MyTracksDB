@@ -97,10 +97,6 @@ class MainActivity : AppCompatActivity() {
             startActivity(SettingsActivity::class.java)
         }
 
-        addButton("TEST") {
-            startActivity(TestActivity::class.java)
-        }
-
         if (TrackRecordManager.recordState != RecordState.NONE)
             startActivity(RecordTrackActivity::class.java)
     }

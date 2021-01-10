@@ -1,10 +1,5 @@
 package com.max.spirihin.mytracksdb.activities
 
-import android.content.Context
-import android.hardware.Sensor
-import android.hardware.SensorEvent
-import android.hardware.SensorEventListener
-import android.hardware.SensorManager
 import android.os.Bundle
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -28,7 +23,7 @@ class StepCounterTestActivity : AppCompatActivity(), HardwareConnector.Listener,
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_step_counter_test)
+        setContentView(R.layout.activity_tracks_list)
 
 
         textView = findViewById<TextView>(R.id.tvTest)

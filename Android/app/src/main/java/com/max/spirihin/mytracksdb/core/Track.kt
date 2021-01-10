@@ -1,5 +1,6 @@
 package com.max.spirihin.mytracksdb.core
 
+import com.max.spirihin.mytracksdb.utilities.Utils
 import java.util.*
 import com.max.spirihin.mytracksdb.utilities.toShortString
 import kotlin.collections.ArrayList
@@ -68,9 +69,9 @@ class Track (val exerciseType : ExerciseType) {
         get() {
             var str = "type = ${exerciseType}\n" +
                     "date = $dateStr\n" +
-                    "time = ${secondsToString(duration)}\n" +
+                    "time = ${Utils.secondsToString(duration)}\n" +
                     "distance = $distance\n" +
-                    "pace = ${secondsToString(pace)}\n" +
+                    "pace = ${Utils.secondsToString(pace)}\n" +
                     "sectors = ${segments.size}\n" +
                     "points = ${segments.sumBy { s -> s.points.size }}\n" +
                     "total steps = $totalSteps\n" +
@@ -113,15 +114,5 @@ class Track (val exerciseType : ExerciseType) {
         segments.last().points.add(point)
     }
 
-    //endregion
-
-    companion object {
-        private fun secondsToString(seconds : Int) : String {
-            val h = seconds / 3600
-            val m = (seconds / 60) % 60
-            val s = seconds % 60
-            return "${if (h > 0) "${String.format("%02d",h)}:" else ""}${String.format("%02d",m)}:${String.format("%02d",s)}"
-        }
-    }
     //endregion
 }

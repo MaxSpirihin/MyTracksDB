@@ -17,7 +17,7 @@ typealias TrackDB = com.max.spirihin.mytracksdb.core.db.Track
     2. pass it to constructor in create method
     3. Increment version number in TracksRoomDatabase
     4. Add migration to array there
-    5. In the app to to settings and press update database
+    5. In the app go to settings and press update database
  */
 
 @Entity
@@ -27,7 +27,8 @@ data class Track(
         @ColumnInfo(name = "date", defaultValue = "0") val date: Date,
         @ColumnInfo(name = "distance", defaultValue = "0") val distance: Int,
         @ColumnInfo(name = "duration", defaultValue = "0") val duration: Int,
-        @ColumnInfo(name = "exercise_type") val exerciseType: ExerciseType
+        @ColumnInfo(name = "exercise_type") val exerciseType: ExerciseType,
+        @ColumnInfo(name = "pace") val pace: Int
 ) {
     fun getTrack(): Track? {
         return TrackParser.fromJSON(id, data)
@@ -35,7 +36,7 @@ data class Track(
 
     companion object {
         fun create(track : Track) : TrackDB {
-            return TrackDB(track.id, TrackParser.toJSON(track), track.date, track.distance, track.duration, track.exerciseType)
+            return TrackDB(track.id, TrackParser.toJSON(track), track.date, track.distance, track.duration, track.exerciseType, track.pace)
         }
     }
 }
