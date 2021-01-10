@@ -1,7 +1,9 @@
 package com.max.spirihin.mytracksdb.core
 
 import android.location.Location
+import com.max.spirihin.mytracksdb.utilities.Print
 import java.util.*
+import kotlin.math.max
 
 class Segment {
 
@@ -29,7 +31,7 @@ class Segment {
 
     /* full duration in seconds */
     val duration: Int
-        get() = if (points.size < 2) 0 else ((points.last().time.time - points.first().time.time) / 1000).toInt()
+        get() = if (points.size < 2) 0 else (points.last().timeInSeconds - points.first().timeInSeconds).toInt()
 
     val totalSteps: Int
         get() = if (points.isNotEmpty()) points.last().steps else 0
@@ -53,6 +55,60 @@ class Segment {
 
     val maxHeartrate : Int
         get() = if (points.isNotEmpty()) points.map { p -> p.heartrate }.max() ?: 0 else 0
+
+    //in m/s
+    val maxSpeed : Double
+    get() {
+        var maxSpeed = 0.0
+        for (i in 1 until points.size) {
+            maxSpeed = max(getSpeedAtPoint(i), maxSpeed)
+        }
+        return maxSpeed
+    }
+
+    fun getSpeedAtPoint(index: Int) : Double {
+        var distance = 0.0
+        val startIndex = max(0, index - 15)
+        for (i in startIndex until index) {
+            distance += TrackPoint.distanceBetween(points[i], points[i+1])
+        }
+        return distance / (points[index].timeInSeconds - points[startIndex].timeInSeconds)
+    }
+
+    /*
+    start, end - in meters
+     */
+    fun getSpeedAtRange(start: Int, end: Int) : Double {
+        var distance = 0.0
+        var startDistance : Double? = null
+        var startTime : Long? = null
+        var endTime : Long? = null
+        for (i in 0 until points.size - 1) {
+            distance += TrackPoint.distanceBetween(points[i], points[i+1])
+            if (startDistance == null && distance >= start) {
+                startDistance = distance
+                startTime = points[i].timeInSeconds
+            }
+
+            if (distance > end) {
+                endTime = points[i].timeInSeconds
+                break
+            }
+        }
+
+        endTime = endTime ?: points.last().timeInSeconds
+
+        if (startDistance == null || startTime == null)
+            return 0.0
+
+        return (distance - startDistance) / (endTime - startTime)
+    }
+
+    val fastestPace : Int
+        get() {
+            val maxSpeed = maxSpeed
+            return if (maxSpeed > 0) (1000.0 / maxSpeed).toInt() else 0
+        }
 
     //endregion
 }
