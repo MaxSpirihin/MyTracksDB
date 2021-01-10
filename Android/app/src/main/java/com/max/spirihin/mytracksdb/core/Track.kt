@@ -4,6 +4,7 @@ import com.max.spirihin.mytracksdb.utilities.Utils
 import java.util.*
 import com.max.spirihin.mytracksdb.utilities.toShortString
 import kotlin.collections.ArrayList
+import kotlin.math.min
 
 class Track (val exerciseType : ExerciseType) {
 
@@ -28,6 +29,9 @@ class Track (val exerciseType : ExerciseType) {
     /* pace in seconds */
     val pace: Int
         get() = if (distance > 0) duration * 1000 / distance else 0
+
+    val fastestPace: Int
+        get() = segments.map { s -> s.fastestPace.toInt() }.min() ?: 0
 
     val totalSteps: Int
         get() = segments.sumBy { s -> s.totalSteps }
@@ -72,6 +76,7 @@ class Track (val exerciseType : ExerciseType) {
                     "time = ${Utils.secondsToString(duration)}\n" +
                     "distance = $distance\n" +
                     "pace = ${Utils.secondsToString(pace)}\n" +
+                    "max pace = ${Utils.secondsToString(fastestPace)}\n" +
                     "sectors = ${segments.size}\n" +
                     "points = ${segments.sumBy { s -> s.points.size }}\n" +
                     "total steps = $totalSteps\n" +
@@ -93,6 +98,14 @@ class Track (val exerciseType : ExerciseType) {
                 str += "errors "
                 for (point in errPoints) {
                     str += String.format("%02f", point.accuracy) + " "
+                }
+            }
+
+            for (segment in segments) {
+                for (i in 0..(segment.distance / 1000)) {
+                    val start = i * 1000
+                    val end = min(i * 1000, segment.distance)
+                    str += "${end / 1000.0} - ${secondsToString((1000 / segment.getSpeedAtRange(start, end)).toInt())}\n"
                 }
             }
 
