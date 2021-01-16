@@ -33,6 +33,12 @@ class Segment {
     val duration: Int
         get() = if (points.size < 2) 0 else (points.last().timeInSeconds - points.first().timeInSeconds).toInt()
 
+    /* full duration in seconds in case if recording is in process */
+    val durationForProcessing: Int
+        get() {
+            return if (points.size < 1) 0 else (Calendar.getInstance().time.time / 1000 - points.first().timeInSeconds).toInt()
+        }
+
     val totalSteps: Int
         get() = if (points.isNotEmpty()) points.last().steps else 0
 

@@ -26,6 +26,10 @@ class Track (val exerciseType : ExerciseType) {
     val duration: Int
         get() = segments.sumBy { s -> s.duration }
 
+    /* full duration in seconds in case if recording is in process */
+    val durationForProcessing: Int
+        get() = if (segments.size < 1) 0 else segments.take(segments.size - 1).sumBy { s -> s.duration } + segments.last().durationForProcessing
+
     /* pace in seconds */
     val pace: Int
         get() = if (distance > 0) duration * 1000 / distance else 0

@@ -23,6 +23,7 @@ class ReplayTrackService : TrackPointsProviderService() {
     private var mOnChangeObservers = mutableListOf<(TrackPoint) -> Unit>()
     private var mAllPoints: MutableList<TrackPoint> = mutableListOf()
     private var mPointIndex: Int = -1
+    private var mTimer: Timer? = null
 
     override fun onCreate() {
         super.onCreate()
@@ -33,8 +34,8 @@ class ReplayTrackService : TrackPointsProviderService() {
         for (segment in track.segments) {
             mAllPoints.addAll(segment.points)
         }
-
-        Timer().schedule(0, 100) {
+        mTimer = Timer()
+        mTimer!!.schedule(0, 100) {
             moveToNext()
         }
     }
@@ -70,6 +71,7 @@ class ReplayTrackService : TrackPointsProviderService() {
         Print.Log("[ReplayTrackService] onDestroy")
 
         mOnChangeObservers.clear()
+        mTimer?.cancel()
 
         super.onDestroy()
     }

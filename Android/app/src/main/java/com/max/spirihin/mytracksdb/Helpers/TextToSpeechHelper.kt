@@ -60,6 +60,7 @@ class TextToSpeechHelper(val context: Context) : TextToSpeech.OnInitListener {
     }
 
     fun destroy() {
+        mTimer.cancel()
         mTextToSpeech.stop()
         mTextToSpeech.shutdown()
         setAudioFocus(false)

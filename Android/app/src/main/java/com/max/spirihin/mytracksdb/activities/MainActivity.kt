@@ -13,15 +13,18 @@ import com.max.spirihin.mytracksdb.R
 import com.max.spirihin.mytracksdb.core.*
 import com.max.spirihin.mytracksdb.utilities.Preferences
 import com.max.spirihin.mytracksdb.utilities.Utils
-import com.max.spirihin.mytracksdb.utilities.toShortString
 import com.max.spirihin.mytracksdb.utilities.toStringFormat
 import com.yandex.mapkit.MapKitFactory
+import java.util.*
+import kotlin.concurrent.schedule
 
 
 class MainActivity : AppCompatActivity() {
 
     var layoutMain : LinearLayout? = null
     var tracksList : View? = null
+    var recordView : View? = null
+    private var mTimer: Timer? = null
     val startButtonsLayouts = mutableListOf<LinearLayout>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,7 +62,7 @@ class MainActivity : AppCompatActivity() {
         TracksDatabase.init(this)
         layoutMain = findViewById(R.id.linLayoutMain)
 
-        createStartButtons(listOf(
+        createButtons(listOf(
                 ExerciseType.EASY_RUN,
                 ExerciseType.WALKING,
                 ExerciseType.BICYCLE,
@@ -68,15 +71,36 @@ class MainActivity : AppCompatActivity() {
                 ExerciseType.SKIING
         ))
 
+        updateView()
+
         findViewById<ImageButton>(R.id.btnSettings).setOnClickListener {
             val intent = Intent(this, SettingsActivity::class.java)
             startActivity(intent)
         }
     }
 
-    private fun createStartButtons(types: List<ExerciseType>) {
+    override fun onResume() {
+        super.onResume()
+
+        mTimer = Timer()
+        mTimer!!.schedule(0, 1000) {
+            runOnUiThread {
+                updateView()
+            }
+        }
+    }
+
+    override fun onPause() {
+        mTimer?.cancel()
+        super.onPause()
+    }
+
+    private fun createButtons(types: List<ExerciseType>) {
         val buttonsInRow = 2
         val margin = resources.getDimension(R.dimen.menu_main_margin).toInt()
+
+        recordView = inflateRecordView()
+        addToLinearLayout(layoutMain!!, recordView!!, margin, margin, margin, 0)
 
         tracksList = inflateTracksListView()
         addToLinearLayout(layoutMain!!, tracksList!!, margin, margin, margin, 0)
@@ -90,6 +114,42 @@ class MainActivity : AppCompatActivity() {
                 val exercise = if (index >= types.size) ExerciseType.UNKNOWN else types[i * buttonsInRow + j]
                 addToLinearLayout(linearLayout, inflateStartButton(exercise), margin / 2, 0, margin / 2, 0)
             }
+            startButtonsLayouts.add(linearLayout)
+        }
+    }
+
+    private fun inflateRecordView() : View {
+        val view: View = LayoutInflater.from(this).inflate(
+                R.layout.menu_main_record, null)
+        view.findViewById<Button>(R.id.button).setOnClickListener {
+            val intent = Intent(this, RecordTrackActivity::class.java)
+            startActivity(intent)
+        }
+        return view
+    }
+
+    private fun updateView() {
+        if (TrackRecordManager.recordState == RecordState.NONE || TrackRecordManager.recordState == RecordState.LISTEN) {
+            for (layout in startButtonsLayouts)
+                layout.visibility = View.VISIBLE
+            recordView!!.visibility = View.GONE
+        } else {
+            for (layout in startButtonsLayouts)
+                layout.visibility = View.GONE
+            recordView!!.visibility = View.VISIBLE
+
+            val track = TrackRecordManager.track
+            if (track != null) {
+                recordView!!.findViewById<TextView>(R.id.tvInfo).text = "${track.exerciseType.getName()}"
+                recordView!!.findViewById<TextView>(R.id.tvStarted).text = "${track.date.toStringFormat("hh:mm")} Started"
+                recordView!!.findViewById<TextView>(R.id.tvPaused).visibility =
+                        if (TrackRecordManager.recordState == RecordState.PAUSE)
+                            View.VISIBLE else
+                                View.INVISIBLE
+                val duration = if (TrackRecordManager.recordState == RecordState.PAUSE) track.duration else track.durationForProcessing
+                recordView!!.findViewById<TextView>(R.id.tvDuration).text = "${Utils.secondsToString(duration)}"
+                recordView!!.findViewById<ImageView>(R.id.ivExercityType).setImageResource(track.exerciseType.getIconId())
+            }
         }
     }
 
@@ -100,7 +160,7 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, TracksListActivity::class.java)
             startActivity(intent)
         }
-        val lastTrack = TracksDatabase.loadAllTracks().sortedByDescending { t -> t.date }.firstOrNull()
+        val lastTrack = TracksDatabase.loadAllTracks().maxBy { t -> t.date }
         if (lastTrack != null) {
             view.findViewById<TextView>(R.id.tvInfo).text = "${lastTrack.exerciseType.getName()} ${lastTrack.date.toStringFormat("dd.MM")}"
             view.findViewById<TextView>(R.id.tvDistance).text = "${Utils.distanceToString(lastTrack.distance)}"
