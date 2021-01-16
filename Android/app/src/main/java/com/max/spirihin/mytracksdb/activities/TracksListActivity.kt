@@ -118,7 +118,7 @@ class TracksListActivity : AppCompatActivity() {
         val objects = mutableListOf<Any>()
         var currentMonth : String? = null
         for (track in tracks) {
-            val month =  SimpleDateFormat("MMMM YYYY", Locale.ENGLISH).format(track.date).toUpperCase()
+            val month =  SimpleDateFormat("MMMM yyyy", Locale.ENGLISH).format(track.date).toUpperCase()
             if (currentMonth != month) {
                 objects.add(month)
                 currentMonth = month
