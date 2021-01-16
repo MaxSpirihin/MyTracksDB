@@ -23,3 +23,27 @@ fun ExerciseType.getIconId(): Int {
     }
 }
 
+fun ExerciseType.getMenuMainIconId(): Int {
+    return when (this) {
+        ExerciseType.EASY_RUN -> R.drawable.menu_main_running
+        ExerciseType.CONTROL_RUN -> R.drawable.menu_main_control_run
+        ExerciseType.WALKING -> R.drawable.menu_main_walking
+        ExerciseType.BICYCLE -> R.drawable.menu_main_bicycle
+        ExerciseType.SKIING -> R.drawable.menu_main_skiing
+        ExerciseType.SKATES -> R.drawable.menu_main_skates
+        else -> 0
+    }
+}
+
+fun ExerciseType.getName(): String {
+    return when (this) {
+        ExerciseType.EASY_RUN -> "Easy run"
+        ExerciseType.CONTROL_RUN -> "Control run"
+        ExerciseType.WALKING -> "Walking"
+        ExerciseType.BICYCLE -> "Bicycle"
+        ExerciseType.SKIING -> "Skiing"
+        ExerciseType.SKATES -> "Skates"
+        else -> ""
+    }
+}
+

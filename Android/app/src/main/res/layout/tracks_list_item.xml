@@ -4,17 +4,18 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginTop="10dp"
+    android:backgroundTint="#FFFFFF"
     android:gravity="center_vertical">
 
     <TextView
-        android:id="@+id/tvDistance"
+        android:id="@+id/text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
         android:text="5.00 km"
         android:textColor="#000000"
         android:textSize="16sp"
-        app:layout_constraintStart_toEndOf="@+id/ivExercityType"
+        app:layout_constraintStart_toEndOf="@+id/bigIcon"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
@@ -56,10 +57,12 @@
         app:layout_constraintTop_toTopOf="@+id/imageView3" />
 
     <ImageView
-        android:id="@+id/ivExercityType"
+        android:id="@+id/bigIcon"
         android:layout_width="30dp"
         android:layout_height="28dp"
         android:layout_marginStart="10dp"
+        android:background="#FFFFFF"
+        android:tint="#757575"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -71,8 +74,8 @@
         android:layout_width="17dp"
         android:layout_height="16dp"
         android:layout_marginTop="4dp"
-        app:layout_constraintStart_toStartOf="@+id/tvDistance"
-        app:layout_constraintTop_toBottomOf="@+id/tvDistance"
+        app:layout_constraintStart_toStartOf="@+id/text"
+        app:layout_constraintTop_toBottomOf="@+id/text"
         app:srcCompat="@drawable/icon_time" />
 
     <ImageView

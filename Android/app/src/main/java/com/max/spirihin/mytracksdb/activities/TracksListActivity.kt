@@ -35,11 +35,11 @@ class TracksListActivity : AppCompatActivity() {
         }
 
         class ViewHolderItem(view: View, private val onItemClicked : (Int) -> Unit) : RecyclerView.ViewHolder(view) {
-            val tvDistance: TextView = view.findViewById(R.id.tvDistance)
+            val tvDistance: TextView = view.findViewById(R.id.text)
             val tvDuration: TextView = view.findViewById(R.id.tvDuration)
             val tvPace: TextView = view.findViewById(R.id.tvPace)
             val tvDate: TextView = view.findViewById(R.id.tvDate)
-            val image: ImageView = view.findViewById(R.id.ivExercityType)
+            val image: ImageView = view.findViewById(R.id.bigIcon)
 
             init {
                 view.setOnClickListener{
@@ -79,13 +79,11 @@ class TracksListActivity : AppCompatActivity() {
 
         // Replace the contents of a view (invoked by the layout manager)
         override fun onBindViewHolder(viewHolder: RecyclerView.ViewHolder, position: Int) {
-
             when (viewHolder.itemViewType) {
                 VIEW_TYPE_ITEM -> {
                     val viewHolderItem = viewHolder as ViewHolderItem
                     val track = (objects[position] as TrackItem).track
-                    val distanceInKM = track.distance / 1000.0
-                    viewHolderItem.tvDistance.text = "%.2f".format(distanceInKM) + " km"
+                    viewHolderItem.tvDistance.text = Utils.distanceToString(track.distance)
                     viewHolderItem.tvDuration.text = Utils.secondsToString(track.duration)
                     viewHolderItem.tvPace.text = Utils.paceToString(track.pace)
                     viewHolderItem.tvDate.text = track.date.toStringFormat("dd.MM")
@@ -98,7 +96,6 @@ class TracksListActivity : AppCompatActivity() {
                 }
                 else -> {}
             }
-
         }
 
         // Return the size of your dataset (invoked by the layout manager)

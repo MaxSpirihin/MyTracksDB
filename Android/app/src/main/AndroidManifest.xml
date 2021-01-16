@@ -25,7 +25,6 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".activities.StepCounterTestActivity"></activity>
-        <activity android:name=".activities.TestActivity"></activity>
         <activity android:name=".activities.TracksListActivity" />
         <activity android:name=".activities.SettingsActivity" />
 

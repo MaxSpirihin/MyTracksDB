@@ -3,24 +3,26 @@ package com.max.spirihin.mytracksdb.activities
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
-import android.widget.Button
-import android.widget.LinearLayout
-import android.widget.Toast
+import android.widget.*
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import com.max.spirihin.mytracksdb.utilities.Preferences
 import com.max.spirihin.mytracksdb.R
-import com.max.spirihin.mytracksdb.core.ExerciseType
-import com.max.spirihin.mytracksdb.core.RecordState
-import com.max.spirihin.mytracksdb.core.TrackRecordManager
-import com.max.spirihin.mytracksdb.core.TracksDatabase
+import com.max.spirihin.mytracksdb.core.*
+import com.max.spirihin.mytracksdb.utilities.Preferences
+import com.max.spirihin.mytracksdb.utilities.Utils
+import com.max.spirihin.mytracksdb.utilities.toShortString
+import com.max.spirihin.mytracksdb.utilities.toStringFormat
 import com.yandex.mapkit.MapKitFactory
+
 
 class MainActivity : AppCompatActivity() {
 
-    private var mLinearLayout : LinearLayout? = null
+    var layoutMain : LinearLayout? = null
+    var tracksList : View? = null
+    val startButtonsLayouts = mutableListOf<LinearLayout>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         MapKitFactory.setApiKey("0e9fede4-9954-4e61-b193-66191985d75d")
@@ -55,62 +57,87 @@ class MainActivity : AppCompatActivity() {
 
     private fun init() {
         TracksDatabase.init(this)
+        layoutMain = findViewById(R.id.linLayoutMain)
 
-        mLinearLayout = findViewById<LinearLayout>(R.id.linLayoutMain)
+        createStartButtons(listOf(
+                ExerciseType.EASY_RUN,
+                ExerciseType.WALKING,
+                ExerciseType.BICYCLE,
+                ExerciseType.CONTROL_RUN,
+                ExerciseType.SKATES,
+                ExerciseType.SKIING
+        ))
 
-        addButton("EASY RUN") {
-            val intent = Intent(this, RecordTrackActivity::class.java)
-            intent.putExtra(RecordTrackActivity.EXERCISE_TYPE_INTENT_STRING, ExerciseType.EASY_RUN.toString())
+        findViewById<ImageButton>(R.id.btnSettings).setOnClickListener {
+            val intent = Intent(this, SettingsActivity::class.java)
             startActivity(intent)
         }
-
-        addButton("WALKING") {
-            val intent = Intent(this, RecordTrackActivity::class.java)
-            intent.putExtra(RecordTrackActivity.EXERCISE_TYPE_INTENT_STRING, ExerciseType.WALKING.toString())
-            startActivity(intent)
-        }
-
-        addButton("SKATES") {
-            val intent = Intent(this, RecordTrackActivity::class.java)
-            intent.putExtra(RecordTrackActivity.EXERCISE_TYPE_INTENT_STRING, ExerciseType.SKATES.toString())
-            startActivity(intent)
-        }
-
-        addButton("SKIING") {
-            val intent = Intent(this, RecordTrackActivity::class.java)
-            intent.putExtra(RecordTrackActivity.EXERCISE_TYPE_INTENT_STRING, ExerciseType.SKIING.toString())
-            startActivity(intent)
-        }
-
-        addButton("TEST RECORD") {
-            val intent = Intent(this, RecordTrackActivity::class.java)
-            intent.putExtra(RecordTrackActivity.EXERCISE_TYPE_INTENT_STRING, ExerciseType.EASY_RUN.toString())
-            intent.putExtra(RecordTrackActivity.USE_TEST_SERVICE_INTENT_STRING, true)
-            startActivity(intent)
-        }
-
-        addButton("TRACKS LIST") {
-            startActivity(TracksListActivity::class.java)
-        }
-
-        addButton("SETTINGS") {
-            startActivity(SettingsActivity::class.java)
-        }
-
-        if (TrackRecordManager.recordState != RecordState.NONE)
-            startActivity(RecordTrackActivity::class.java)
     }
 
-    private fun addButton(text : String, action : () -> Unit) {
-        val button = Button(this)
-        button.text = text
-        button.setOnClickListener{ action?.invoke()}
-        mLinearLayout?.addView(button)
+    private fun createStartButtons(types: List<ExerciseType>) {
+        val buttonsInRow = 2
+        val margin = resources.getDimension(R.dimen.menu_main_margin).toInt()
+
+        tracksList = inflateTracksListView()
+        addToLinearLayout(layoutMain!!, tracksList!!, margin, margin, margin, 0)
+
+        for (i in 0 until types.size / buttonsInRow) {
+            val linearLayout = LinearLayout(this)
+            linearLayout.orientation = LinearLayout.HORIZONTAL
+            addToLinearLayout(layoutMain!!, linearLayout, margin / 2, margin, margin / 2, 0)
+            for (j in 0 until buttonsInRow) {
+                val index = i * buttonsInRow + j
+                val exercise = if (index >= types.size) ExerciseType.UNKNOWN else types[i * buttonsInRow + j]
+                addToLinearLayout(linearLayout, inflateStartButton(exercise), margin / 2, 0, margin / 2, 0)
+            }
+        }
     }
 
-    private fun startActivity(cls: Class<*>) {
-        val intent = Intent(this, cls)
-        startActivity(intent)
+    private fun inflateTracksListView() : View {
+        val view: View = LayoutInflater.from(this).inflate(
+                R.layout.menu_main_show_tracks, null)
+        view.findViewById<Button>(R.id.button).setOnClickListener {
+            val intent = Intent(this, TracksListActivity::class.java)
+            startActivity(intent)
+        }
+        val lastTrack = TracksDatabase.loadAllTracks().sortedByDescending { t -> t.date }.firstOrNull()
+        if (lastTrack != null) {
+            view.findViewById<TextView>(R.id.tvInfo).text = "${lastTrack.exerciseType.getName()} ${lastTrack.date.toStringFormat("dd.MM")}"
+            view.findViewById<TextView>(R.id.tvDistance).text = "${Utils.distanceToString(lastTrack.distance)}"
+            view.findViewById<TextView>(R.id.tvDuration).text = "${Utils.secondsToString(lastTrack.duration)}"
+            view.findViewById<ImageView>(R.id.ivExercityType).setImageResource(lastTrack.exerciseType.getIconId())
+        }
+        return view
+    }
+
+    private fun inflateStartButton(exerciseType: ExerciseType) : View {
+        val view: View = LayoutInflater.from(this).inflate(
+                R.layout.menu_main_start, null)
+        view.findViewById<ImageView>(R.id.image).setImageResource(exerciseType.getMenuMainIconId())
+        view.findViewById<TextView>(R.id.text).text = exerciseType.getName().toUpperCase()
+        view.findViewById<Button>(R.id.button).setOnClickListener {
+            val intent = Intent(this, RecordTrackActivity::class.java)
+            intent.putExtra(RecordTrackActivity.EXERCISE_TYPE_INTENT_STRING, exerciseType.toString())
+            startActivity(intent)
+        }
+        return view
+    }
+
+    private fun addToLinearLayout(
+            linearLayout: LinearLayout,
+            view: View,
+            marginLeft: Int,
+            marginTop: Int,
+            marginRight: Int,
+            marginBottom: Int) {
+        val lp = LinearLayout.LayoutParams(
+                if (linearLayout.orientation == LinearLayout.HORIZONTAL) 0 else LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                1f
+        )
+        lp.setMargins(marginLeft, marginTop, marginRight, marginBottom)
+        view.layoutParams = lp
+        linearLayout.addView(view)
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {

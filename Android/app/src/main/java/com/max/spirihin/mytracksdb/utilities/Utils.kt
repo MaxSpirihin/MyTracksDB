@@ -1,6 +1,11 @@
 package com.max.spirihin.mytracksdb.utilities
 
 object Utils {
+    fun distanceToString(distanceInMeters : Int) : String {
+        val distanceInKM = distanceInMeters / 1000.0
+        return "%.2f".format(distanceInKM) + " km"
+    }
+
     fun secondsToString(seconds : Int) : String {
         val h = seconds / 3600
         val m = (seconds / 60) % 60
