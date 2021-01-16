@@ -6,6 +6,11 @@ object Utils {
         return "%.2f".format(distanceInKM) + " km"
     }
 
+    fun distanceToStringShort(distanceInMeters : Int) : String {
+        val distanceInKM = distanceInMeters / 1000.0
+        return "%.1f".format(distanceInKM)
+    }
+
     fun secondsToString(seconds : Int) : String {
         val h = seconds / 3600
         val m = (seconds / 60) % 60

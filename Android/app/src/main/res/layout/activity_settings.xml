@@ -36,6 +36,20 @@
             android:inputType="number"
             android:text="1"/>
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="100px"
+            android:inputType="number"
+            android:text="Max allowed gps accuracy (in meters)"/>
+
+        <EditText
+            android:id="@+id/etGPSAccuracy"
+            android:layout_width="match_parent"
+            android:layout_height="150px"
+            android:inputType="number"
+            android:text="1"/>
+
+
         <Button
             android:id="@+id/btnUpdateDB"
             android:layout_width="match_parent"

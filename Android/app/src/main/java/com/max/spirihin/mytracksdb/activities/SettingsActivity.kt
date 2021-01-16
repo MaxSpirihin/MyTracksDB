@@ -34,6 +34,12 @@ class SettingsActivity : AppCompatActivity() {
                 Preferences.gpsUpdateMeters = text.toString().toInt()
         }
 
+        etGPSMeters.setText(Preferences.gpsMaxAccuracy.toString())
+        etGPSMeters.doOnTextChanged { text, _, _, _ ->
+            if (!text.isNullOrBlank())
+                Preferences.gpsMaxAccuracy = text.toString().toInt()
+        }
+
         findViewById<View>(R.id.btnUpdateDB).setOnClickListener {
             AlertDialog.Builder(this)
                     .setTitle("Update database")

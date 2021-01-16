@@ -1,6 +1,7 @@
 package com.max.spirihin.mytracksdb.core
 
 import android.util.JsonWriter
+import com.max.spirihin.mytracksdb.utilities.Preferences
 import com.max.spirihin.mytracksdb.utilities.Print
 import org.json.JSONObject
 import org.w3c.dom.Element
@@ -116,7 +117,7 @@ object TrackParser {
 
                     //TODO: move this condition somewhere else
                     //ignore points with gps mistakes
-                    if (point.accuracy < 20)
+                    if (point.accuracy < Preferences.gpsMaxAccuracy)
                         segment.points.add(point)
                 }
             }

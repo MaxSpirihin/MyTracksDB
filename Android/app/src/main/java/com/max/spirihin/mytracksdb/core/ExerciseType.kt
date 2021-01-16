@@ -43,6 +43,7 @@ fun ExerciseType.getName(): String {
         ExerciseType.BICYCLE -> "Bicycle"
         ExerciseType.SKIING -> "Skiing"
         ExerciseType.SKATES -> "Skates"
+        ExerciseType.UNKNOWN -> "All"
         else -> ""
     }
 }

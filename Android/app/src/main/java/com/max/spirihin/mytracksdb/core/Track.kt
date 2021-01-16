@@ -1,5 +1,6 @@
 package com.max.spirihin.mytracksdb.core
 
+import com.max.spirihin.mytracksdb.utilities.Preferences
 import com.max.spirihin.mytracksdb.utilities.Utils
 import java.util.*
 import com.max.spirihin.mytracksdb.utilities.toShortString
@@ -95,7 +96,7 @@ class Track (val exerciseType : ExerciseType) {
             val errPoints = mutableListOf<TrackPoint>()
             for (segment in segments) {
                 for (point in segment.points) {
-                    if (point.accuracy > 50) {
+                    if (point.accuracy > Preferences.gpsMaxAccuracy) {
                         errPoints.add(point)
                     }
                 }

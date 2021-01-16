@@ -34,6 +34,17 @@ object Preferences {
             }
         }
 
+    var gpsMaxAccuracy: Int
+        get() {
+            return sharedPreferences!!.getInt("gps_max_accuracy", 20)
+        }
+        set(value) {
+            with (sharedPreferences!!.edit()) {
+                putInt("gps_max_accuracy", value)
+                apply()
+            }
+        }
+
     fun getString(key: String, default: String) : String {
         return sharedPreferences!!.getString(key, default) ?: default
     }

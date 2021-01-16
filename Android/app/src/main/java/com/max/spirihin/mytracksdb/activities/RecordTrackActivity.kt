@@ -4,6 +4,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.widget.Button
 import android.widget.TextView
 import androidx.annotation.RequiresApi
@@ -12,6 +13,11 @@ import androidx.appcompat.app.AppCompatActivity
 import com.max.spirihin.mytracksdb.*
 import com.max.spirihin.mytracksdb.core.*
 import com.max.spirihin.mytracksdb.ui.YandexMap
+import com.max.spirihin.mytracksdb.utilities.Print
+import java.io.File
+import java.lang.Exception
+import java.nio.file.Paths
+import java.util.*
 
 class RecordTrackActivity : AppCompatActivity() {
 
@@ -31,6 +37,16 @@ class RecordTrackActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
+
+        Thread.setDefaultUncaughtExceptionHandler { paramThread, paramThrowable ->
+            val directoryPath = Environment.getExternalStorageDirectory().absolutePath + "/MyTracksDB"
+            val directory = File(directoryPath)
+            if (!directory.exists())
+                directory.mkdir()
+
+            File(directoryPath, "log${Calendar.getInstance().time.time}.txt").writeText("ERROR = ${paramThrowable.message} ${paramThrowable.stackTrace.joinToString { s -> s.toString() + "\n" }}")
+        }
+
         setContentView(R.layout.activity_record_track)
         yandexMap = YandexMap(this, findViewById(R.id.mapview))
 
