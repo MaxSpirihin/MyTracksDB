@@ -9,8 +9,10 @@ import android.os.IBinder
 import com.max.spirihin.mytracksdb.core.TrackPoint
 import com.max.spirihin.mytracksdb.listeners.StepCounterListener
 import com.max.spirihin.mytracksdb.core.TrackRecordManager
+import com.max.spirihin.mytracksdb.core.WeatherInfo
 import com.max.spirihin.mytracksdb.listeners.HeartRateListener
 import com.max.spirihin.mytracksdb.listeners.LocationListener
+import com.max.spirihin.mytracksdb.listeners.WeatherListener
 import com.max.spirihin.mytracksdb.utilities.Print
 import java.util.*
 
@@ -19,10 +21,9 @@ class RecordTrackService : TrackPointsProviderService() {
     private var stepCounterListener : StepCounterListener? = null
     private var locationListener : LocationListener? = null
     private var heartRateListener : HeartRateListener? = null
+    private var weatherListener : WeatherListener? = null
 
     private var mOnChangeObservers = mutableListOf<(TrackPoint) -> Unit>()
-
-
 
     override fun onCreate() {
         super.onCreate()
@@ -31,6 +32,7 @@ class RecordTrackService : TrackPointsProviderService() {
 
         stepCounterListener = StepCounterListener()
         heartRateListener = HeartRateListener()
+        weatherListener = WeatherListener()
         locationListener = LocationListener { location -> onLocationChanged() }
         TrackRecordManager.attachPointsProvider(this)
     }
@@ -45,6 +47,10 @@ class RecordTrackService : TrackPointsProviderService() {
                 stepCounterListener?.stepsCount ?: 0,
                 heartRateListener?.currentHeartrate ?: 0
         )
+    }
+
+    override fun getTrackWeather(): WeatherInfo? {
+        return weatherListener?.weatherInfo
     }
 
     override fun subscribe(observer: (TrackPoint) -> Unit) {
@@ -66,6 +72,7 @@ class RecordTrackService : TrackPointsProviderService() {
         for (observer in mOnChangeObservers) {
             observer?.invoke(point)
         }
+        weatherListener?.onLocationChanged(point.latitude, point.longitude)
     }
 
     @SuppressLint("MissingPermission")
@@ -75,6 +82,7 @@ class RecordTrackService : TrackPointsProviderService() {
         locationListener?.startListen(this)
         stepCounterListener?.startListen(this)
         heartRateListener?.startListen(this)
+        weatherListener?.startListen(this)
         return super.onStartCommand(intent, flags, startId)
     }
 
@@ -84,6 +92,7 @@ class RecordTrackService : TrackPointsProviderService() {
         locationListener?.stopListen()
         stepCounterListener?.stopListen()
         heartRateListener?.stopListen()
+        weatherListener?.stopListen()
 
         mOnChangeObservers.clear()
 

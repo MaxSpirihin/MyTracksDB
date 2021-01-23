@@ -24,7 +24,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activities.StepCounterTestActivity"></activity>
+        <activity android:name=".activities.TestActivity"></activity>
         <activity android:name=".activities.TracksListActivity" />
         <activity android:name=".activities.SettingsActivity" />
 
@@ -32,6 +32,7 @@
         <service  android:name=".services.ReplayTrackService" android:enabled="true" android:exported="true" />
 
         <activity android:name=".activities.RecordTrackActivity" />
+        <activity android:name=".activities.ShowTrackActivityOld" />
         <activity android:name=".activities.ShowTrackActivity" />
         <activity android:name=".activities.MainActivity">
             <intent-filter>

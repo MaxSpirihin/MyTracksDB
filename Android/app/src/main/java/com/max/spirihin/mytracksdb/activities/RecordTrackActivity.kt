@@ -13,10 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.max.spirihin.mytracksdb.*
 import com.max.spirihin.mytracksdb.core.*
 import com.max.spirihin.mytracksdb.ui.YandexMap
-import com.max.spirihin.mytracksdb.utilities.Print
 import java.io.File
-import java.lang.Exception
-import java.nio.file.Paths
 import java.util.*
 
 class RecordTrackActivity : AppCompatActivity() {

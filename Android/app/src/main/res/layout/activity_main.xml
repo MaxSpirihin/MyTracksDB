@@ -59,5 +59,30 @@
         app:layout_constraintEnd_toEndOf="@+id/toolbar"
         app:layout_constraintTop_toTopOf="@+id/toolbar"
         app:srcCompat="@drawable/icon_settings" />
+
+    <ImageButton
+        android:id="@+id/btnTest"
+        android:layout_width="29dp"
+        android:layout_height="30dp"
+        android:layout_marginEnd="48dp"
+        android:background="@color/white"
+        android:scaleType="fitXY"
+        app:layout_constraintBottom_toBottomOf="@+id/toolbar"
+        app:layout_constraintEnd_toEndOf="@+id/toolbar"
+        app:layout_constraintTop_toTopOf="@+id/toolbar"
+        app:srcCompat="@drawable/icon_settings" />
+
+    <ImageButton
+        android:id="@+id/btnTestRecord"
+        android:layout_width="29dp"
+        android:layout_height="30dp"
+        android:layout_marginEnd="84dp"
+        android:background="@color/white"
+        android:scaleType="fitXY"
+        app:layout_constraintBottom_toBottomOf="@+id/toolbar"
+        app:layout_constraintEnd_toEndOf="@+id/toolbar"
+        app:layout_constraintTop_toTopOf="@+id/toolbar"
+        app:layout_constraintVertical_bias="0.461"
+        app:srcCompat="@drawable/icon_settings" />
 </androidx.constraintlayout.widget.ConstraintLayout>
 

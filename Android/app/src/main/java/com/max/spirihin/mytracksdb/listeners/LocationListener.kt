@@ -8,7 +8,7 @@ import android.location.LocationManager
 import com.max.spirihin.mytracksdb.utilities.Preferences
 import com.max.spirihin.mytracksdb.utilities.Print
 
-class LocationListener(private val callback : ((Location) -> Unit)?) : android.location.LocationListener, IListener {
+class LocationListener(private val callback : ((Location) -> Unit)?) : android.location.LocationListener {
 
     private var locationManager : LocationManager? = null
     var lastLocation : Location? = null
@@ -22,7 +22,7 @@ class LocationListener(private val callback : ((Location) -> Unit)?) : android.l
     }
 
     @SuppressLint("MissingPermission")
-    override fun startListen(context: Context) {
+    fun startListen(context: Context) {
         val criteria = Criteria()
         criteria.accuracy = Criteria.ACCURACY_FINE
         criteria.powerRequirement = Criteria.POWER_HIGH
@@ -42,7 +42,7 @@ class LocationListener(private val callback : ((Location) -> Unit)?) : android.l
         )
     }
 
-    override fun stopListen() {
+    fun stopListen() {
         locationManager?.removeUpdates(this)
     }
 

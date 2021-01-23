@@ -77,6 +77,17 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, SettingsActivity::class.java)
             startActivity(intent)
         }
+
+        findViewById<ImageButton>(R.id.btnTest).setOnClickListener {
+            val intent = Intent(this, TestActivity::class.java)
+            startActivity(intent)
+        }
+
+        findViewById<ImageButton>(R.id.btnTestRecord).setOnClickListener {
+            val intent = Intent(this, RecordTrackActivity::class.java)
+            intent.putExtra(RecordTrackActivity.USE_TEST_SERVICE_INTENT_STRING, true)
+            startActivity(intent)
+        }
     }
 
     override fun onResume() {

@@ -12,6 +12,7 @@ class Track (val exerciseType : ExerciseType) {
     //region attrubutes
     val segments: ArrayList<Segment> = ArrayList()
     var id: Long = 0
+    var weatherInfo: WeatherInfo? = null
 
     private var needNewSegment = false
     //endregion
@@ -74,6 +75,16 @@ class Track (val exerciseType : ExerciseType) {
             return "Pass $distance meters." + if (averageHeartrate > 0) "Average heartrate is $averageHeartrate" else ""
         }
 
+    val firstPoint : TrackPoint?
+    get() {
+        for (segment in segments) {
+            for (point in segment.points) {
+                return point
+            }
+        }
+        return null
+    }
+
     val infoStr: String
         get() {
             var str = "type = ${exerciseType}\n" +
@@ -115,6 +126,10 @@ class Track (val exerciseType : ExerciseType) {
                     val end = min((i + 1) * 1000, segment.distance)
                     str += "${end / 1000.0} - ${Utils.paceToString((1000 / segment.getSpeedAtRange(start, end)).toInt())}\n"
                 }
+            }
+
+            if (weatherInfo != null) {
+                str += weatherInfo!!.json + "\n"
             }
 
             return str

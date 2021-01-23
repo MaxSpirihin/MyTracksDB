@@ -39,6 +39,10 @@ object TrackParser {
             jsonWriter.endObject()//end segment
         }
         jsonWriter.endArray()
+
+        if (track.weatherInfo != null)
+            jsonWriter.name("weather").value(track.weatherInfo!!.json)
+
         jsonWriter.endObject() // end root
         return stringWriter.toString()
     }
@@ -121,6 +125,8 @@ object TrackParser {
                         segment.points.add(point)
                 }
             }
+
+            track.weatherInfo =  if (jsonRoot.has("weather")) WeatherInfo(jsonRoot.getString("weather")) else null
             track
         } catch (e: Exception) {
             Print.LogError(e.toString())

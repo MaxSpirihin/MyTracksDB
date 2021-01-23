@@ -14,13 +14,13 @@ import com.wahoofitness.connector.conn.connections.params.ConnectionParams
 import com.wahoofitness.connector.listeners.discovery.DiscoveryListener
 
 //TODO Support cache connectionParams and break connection
-class HeartRateListener : IListener, HardwareConnector.Listener, DiscoveryListener, SensorConnection.Listener, Heartrate.Listener {
+class HeartRateListener : HardwareConnector.Listener, DiscoveryListener, SensorConnection.Listener, Heartrate.Listener {
     var currentHeartrate : Int = 0
         private set
     private var hardwareConnector : HardwareConnector? = null
     private var context : Context? = null
 
-    override fun startListen(context: Context) {
+    fun startListen(context: Context) {
         this.context = context
         hardwareConnector = HardwareConnector(context, this)
         val seriaized = Preferences.getString("HeartRateConnectionParams", "")
@@ -31,7 +31,7 @@ class HeartRateListener : IListener, HardwareConnector.Listener, DiscoveryListen
             hardwareConnector!!.startDiscovery(this)
     }
 
-    override fun stopListen() {
+    fun stopListen() {
         hardwareConnector!!.shutdown()
     }
 

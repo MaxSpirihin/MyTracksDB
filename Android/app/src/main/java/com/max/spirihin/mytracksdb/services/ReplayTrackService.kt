@@ -7,11 +7,8 @@ import android.content.Intent
 import android.os.Build
 import android.os.IBinder
 import android.speech.tts.TextToSpeech
-import com.max.spirihin.mytracksdb.core.Track
-import com.max.spirihin.mytracksdb.core.TrackPoint
+import com.max.spirihin.mytracksdb.core.*
 import com.max.spirihin.mytracksdb.listeners.StepCounterListener
-import com.max.spirihin.mytracksdb.core.TrackRecordManager
-import com.max.spirihin.mytracksdb.core.TracksDatabase
 import com.max.spirihin.mytracksdb.listeners.HeartRateListener
 import com.max.spirihin.mytracksdb.listeners.LocationListener
 import com.max.spirihin.mytracksdb.utilities.Print
@@ -22,6 +19,7 @@ class ReplayTrackService : TrackPointsProviderService() {
 
     private var mOnChangeObservers = mutableListOf<(TrackPoint) -> Unit>()
     private var mAllPoints: MutableList<TrackPoint> = mutableListOf()
+    private var weatherInfo: WeatherInfo? = null
     private var mPointIndex: Int = -1
     private var mTimer: Timer? = null
 
@@ -34,6 +32,7 @@ class ReplayTrackService : TrackPointsProviderService() {
         for (segment in track.segments) {
             mAllPoints.addAll(segment.points)
         }
+        weatherInfo = track.weatherInfo
         mTimer = Timer()
         mTimer!!.schedule(0, 100) {
             moveToNext()
@@ -42,6 +41,10 @@ class ReplayTrackService : TrackPointsProviderService() {
 
     override fun getCurrentPoint() : TrackPoint? {
         return mAllPoints[mPointIndex]
+    }
+
+    override fun getTrackWeather(): WeatherInfo? {
+        return weatherInfo
     }
 
     override fun subscribe(observer: (TrackPoint) -> Unit) {

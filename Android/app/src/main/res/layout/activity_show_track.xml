@@ -3,60 +3,76 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".activities.RecordTrackActivity">
+    android:layout_height="match_parent">
 
-        <LinearLayout
-            android:id="@+id/linLayoutLog"
+    <ImageView
+        android:id="@+id/toolbar"
+        style="@style/Toolbar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
+        android:id="@+id/btnBack"
+        android:layout_width="29dp"
+        android:layout_height="30dp"
+        android:layout_marginStart="10dp"
+        android:background="@color/white"
+        android:scaleType="fitXY"
+        android:tint="#3C3C3C"
+        app:layout_constraintBottom_toBottomOf="@+id/toolbar"
+        app:layout_constraintStart_toStartOf="@+id/toolbar"
+        app:layout_constraintTop_toTopOf="@+id/toolbar"
+        app:srcCompat="@drawable/icon_arrow_back" />
+
+    <ImageButton
+        android:id="@+id/btnDelete"
+        android:layout_width="29dp"
+        android:layout_height="30dp"
+        android:layout_marginEnd="10dp"
+        android:background="@color/white"
+        android:scaleType="fitXY"
+        android:tint="#3C3C3C"
+        app:layout_constraintBottom_toBottomOf="@+id/tvExerciseType"
+        app:layout_constraintEnd_toEndOf="@+id/toolbar"
+        app:layout_constraintTop_toTopOf="@+id/tvExerciseType"
+        app:layout_constraintVertical_bias="0.615"
+        app:srcCompat="@drawable/icon_delete" />
+
+    <TextView
+        android:id="@+id/tvExerciseType"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:text="Easy Run"
+        android:textColor="#1B1B1B"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toBottomOf="@+id/btnBack"
+        app:layout_constraintStart_toEndOf="@+id/btnBack"
+        app:layout_constraintTop_toTopOf="@+id/btnBack" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar">
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tab_layout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:minWidth="25px"
-            android:minHeight="25px"
-            android:orientation="vertical">
+            android:layout_height="wrap_content"
+            android:background="#FFFFFF"
+            app:tabTextAppearance="@style/TextTabAppearance">
 
-            <com.yandex.mapkit.mapview.MapView
-            android:id="@+id/mapview"
+        </com.google.android.material.tabs.TabLayout>
+
+        <com.max.spirihin.mytracksdb.ui.SwipeDisabledViewPager
+            android:id="@+id/view_pager"
             android:layout_width="match_parent"
-            android:layout_height="350dp"/>
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <Button
-                    android:id="@+id/btnDelete"
-                    android:layout_width="100dp"
-                    android:layout_height="150px"
-                    android:layout_alignParentRight="true"
-                    android:layout_marginRight="115dp"
-                    android:text="delete" />
-
-                <Button
-                    android:id="@+id/btnLoadGPX"
-                    android:layout_width="100dp"
-                    android:layout_height="150px"
-                    android:layout_alignParentRight="true"
-                    android:text="LoadGPX" />
-            </RelativeLayout>
-
-            <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:app="http://schemas.android.com/apk/res-auto"
-                xmlns:tools="http://schemas.android.com/tools"
-                android:id="@+id/scrollViewLog"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:minWidth="25px"
-                android:minHeight="25px"
-                android:orientation="vertical">
-            <TextView
-                android:id="@+id/textViewData"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-
-                android:text="" />
-
-            </ScrollView>
-        </LinearLayout>
+            android:layout_height="0px"
+            android:layout_weight="1" />
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

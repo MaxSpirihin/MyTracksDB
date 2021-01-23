@@ -116,7 +116,7 @@ class YandexMap constructor(private val context: Activity, private val mapView: 
         if (!isMapZoomed) {
             isMapZoomed = true
             mapView.map.move(
-                    CameraPosition(point, zoom, 0.0f, 0.0f),
+                    CameraPosition(point,if (zoom.isFinite()) zoom else 14.0f, 0.0f, 0.0f),
                     Animation(Animation.Type.LINEAR, 0.0f),
                     null)
         }

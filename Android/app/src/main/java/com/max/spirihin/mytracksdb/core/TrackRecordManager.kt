@@ -7,7 +7,13 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.widget.Toast
 import androidx.core.app.NotificationCompat
+import com.android.volley.Request
+import com.android.volley.RequestQueue
+import com.android.volley.Response
+import com.android.volley.toolbox.JsonObjectRequest
+import com.android.volley.toolbox.Volley
 import com.garmin.fit.Bool
 import com.max.spirihin.mytracksdb.Helpers.TextToSpeechHelper
 import com.max.spirihin.mytracksdb.R
@@ -81,6 +87,10 @@ object TrackRecordManager {
         track = Track(exerciseType)
         mTextToSpeech = TextToSpeechHelper(context.applicationContext)
         mDistanceForSpeech = track!!.speechDistance
+
+        val startPoint = mService?.getCurrentPoint()
+        if (startPoint != null)
+            track!!.addPoint(startPoint)
     }
 
     fun getLastPoint() : TrackPoint? {
@@ -117,10 +127,12 @@ object TrackRecordManager {
         if (recordState != RecordState.PAUSE)
             throw Exception("Cant stop recording from state $recordState")
 
-        val track = TrackRecordManager.track ?: return null
+        val track = TrackRecordManager.track
 
-        if (saveTrack)
+        if (track != null && saveTrack) {
+            track.weatherInfo = mService?.getTrackWeather()
             track.id = TracksDatabase.saveTrack(track)
+        }
 
         Print.Log("Stop record")
         recordState = RecordState.NONE

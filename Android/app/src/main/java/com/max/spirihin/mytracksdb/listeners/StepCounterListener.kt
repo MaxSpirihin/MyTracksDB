@@ -7,14 +7,14 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import com.max.spirihin.mytracksdb.utilities.Print
 
-class StepCounterListener : SensorEventListener, IListener {
+class StepCounterListener : SensorEventListener {
     private var startStepsCount : Int? = null
     var stepsCount : Int = 0
         private set
     var sensorManager : SensorManager? = null
     var sensor : Sensor? = null
 
-    override fun startListen(context: Context) {
+    fun startListen(context: Context) {
         sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
         if (sensorManager == null)
         {
@@ -34,7 +34,7 @@ class StepCounterListener : SensorEventListener, IListener {
                 SensorManager.SENSOR_DELAY_NORMAL)
     }
 
-    override fun stopListen() {
+    fun stopListen() {
         if (sensorManager != null && sensor != null)
             sensorManager?.unregisterListener(this, sensor)
     }
