@@ -43,7 +43,10 @@ class RecordTrackService : TrackPointsProviderService() {
                 Calendar.getInstance().time,
                 location.latitude,
                 location.longitude,
+                location.altitude,
                 location.accuracy.toDouble(),
+                location.speed.toDouble(),
+                location.speedAccuracyMetersPerSecond.toDouble(),
                 stepCounterListener?.stepsCount ?: 0,
                 heartRateListener?.currentHeartrate ?: 0
         )

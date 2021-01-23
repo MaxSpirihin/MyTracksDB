@@ -75,15 +75,14 @@ class Track (val exerciseType : ExerciseType) {
             return "Pass $distance meters." + if (averageHeartrate > 0) "Average heartrate is $averageHeartrate" else ""
         }
 
-    val firstPoint : TrackPoint?
-    get() {
-        for (segment in segments) {
-            for (point in segment.points) {
-                return point
-            }
-        }
-        return null
-    }
+    val averageAltitude : Double
+        get() = if (segments.isNotEmpty()) segments.sumByDouble { s -> s.averageAltitude } / segments.count() else 0.0
+
+    val averageSpeedNative : Double
+        get() = if (segments.isNotEmpty()) segments.sumByDouble { s -> s.averageSpeedNative } / segments.count() else 0.0
+
+    val averagePaceNative : Int
+        get() = if (averageSpeedNative > 0) (1000.0 / averageSpeedNative).toInt() else 0
 
     val infoStr: String
         get() {
@@ -91,8 +90,11 @@ class Track (val exerciseType : ExerciseType) {
                     "date = $dateStr\n" +
                     "time = ${Utils.secondsToString(duration)}\n" +
                     "distance = $distance\n" +
+                    "averageAltitude = $averageAltitude\n" +
                     "pace = ${Utils.secondsToString(pace)}\n" +
                     "max pace = ${Utils.secondsToString(fastestPace)}\n" +
+                    "average speed native = ${averageSpeedNative}\n" +
+                    "average pace native = ${Utils.secondsToString(averagePaceNative)}\n" +
                     "sectors = ${segments.size}\n" +
                     "points = ${segments.sumBy { s -> s.points.size }}\n" +
                     "total steps = $totalSteps\n" +

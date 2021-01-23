@@ -56,6 +56,12 @@ class Segment {
             return if (pointsCount > 0) heartrateSum / pointsCount else 0
         }
 
+    val averageAltitude : Double
+        get() =  if (points.isNotEmpty()) points.sumByDouble { p -> p.altitude } / points.count() else 0.0
+
+    val averageSpeedNative : Double
+        get() =  if (points.isNotEmpty()) points.sumByDouble { p -> p.speed } / points.count() else 0.0
+
     val currentHeartrate : Int
         get() = if (points.isNotEmpty()) points.last().heartrate else 0
 

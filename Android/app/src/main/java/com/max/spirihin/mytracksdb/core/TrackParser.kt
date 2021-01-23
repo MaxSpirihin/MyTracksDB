@@ -30,7 +30,10 @@ object TrackParser {
                 jsonWriter.name("date").value(point.time.time)
                 jsonWriter.name("latitude").value(point.latitude)
                 jsonWriter.name("longitude").value(point.longitude)
+                jsonWriter.name("altitude").value(point.altitude)
                 jsonWriter.name("accuracy").value(point.accuracy)
+                jsonWriter.name("speed").value(point.speed)
+                jsonWriter.name("speedAccuracy").value(point.speedAccuracy)
                 jsonWriter.name("steps").value(point.steps)
                 jsonWriter.name("heartrate").value(point.heartrate)
                 jsonWriter.endObject()
@@ -70,8 +73,9 @@ object TrackParser {
                     val longitude = point.getAttribute("lon").toDouble()
                     val timeStr = (point.getElementsByTagName("time").item(0) as Element).textContent
                     val format = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
+                    val altitude = (point.getElementsByTagName("ele").item(0) as Element).textContent.toDouble()
                     val time = format.parse(timeStr)
-                    segment.points.add(TrackPoint(time!!, latitude, longitude, 0.0, 0, 0))
+                    segment.points.add(TrackPoint(time!!, latitude, longitude, altitude,0.0, 0.0,0.0,0, 0))
                 }
                 track.segments.add(segment)
             }
@@ -114,7 +118,10 @@ object TrackParser {
                             Date(pointJson.getLong("date")),
                             pointJson.getDouble("latitude"),
                             pointJson.getDouble("longitude"),
+                            if (pointJson.has("altitude")) pointJson.getDouble("altitude") else 0.0,
                             pointJson.getDouble("accuracy"),
+                            if (pointJson.has("speed")) pointJson.getDouble("speed") else 0.0,
+                            if (pointJson.has("speedAccuracy")) pointJson.getDouble("speedAccuracy") else 0.0,
                             if (pointJson.has("steps")) pointJson.getInt("steps") else 0,
                             if (pointJson.has("heartrate")) pointJson.getInt("heartrate") else 0
                     )
@@ -147,7 +154,10 @@ object TrackParser {
                         Date(pointJson.getLong("date")),
                         pointJson.getDouble("latitude"),
                         pointJson.getDouble("longitude"),
+                        0.0,
                         pointJson.getDouble("accuracy"),
+                        0.0,
+                        0.0,
                         if (pointJson.has("steps")) pointJson.getInt("steps") else 0,
                         if (pointJson.has("heartrate")) pointJson.getInt("heartrate") else 0
                 ))
