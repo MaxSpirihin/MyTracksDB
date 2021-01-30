@@ -23,10 +23,25 @@ import java.util.*
 
 class TracksListActivity : AppCompatActivity() {
 
-    //region nested types
-    class MonthItem(val month: String, val hided: Boolean)
+    enum class GroupType {
+        MONTH,
+        YEAR,
+        //TODO WEEK,
+        ALL_TIME;
 
-    class MonthSummary(val isOneExerciseType: Boolean) {
+        fun getName() : String {
+            return when (this) {
+                MONTH -> "By month"
+                YEAR -> "By year"
+                ALL_TIME -> "No grouping"
+            }
+        }
+    }
+
+    //region nested types
+    class GroupItem(val groupName: String, val hided: Boolean)
+
+    class GroupSummary(val isOneExerciseType: Boolean) {
         private val tracks = mutableListOf<TrackDB>()
 
         fun getDescriptions(): Map<String, String> {
@@ -73,8 +88,8 @@ class TracksListActivity : AppCompatActivity() {
 
         companion object {
             const val VIEW_TYPE_ITEM = 0
-            const val VIEW_TYPE_MONTH = 1
-            const val VIEW_TYPE_MONTH_SUMMARY = 2
+            const val VIEW_TYPE_GROUP = 1
+            const val VIEW_TYPE_GROUP_SUMMARY = 2
         }
 
         class ViewHolderItem(view: View, private val onItemClicked: (Int) -> Unit) : RecyclerView.ViewHolder(view) {
@@ -91,7 +106,7 @@ class TracksListActivity : AppCompatActivity() {
             }
         }
 
-        class ViewHolderMonth(view: View, private val onItemClicked: (Int) -> Unit) : RecyclerView.ViewHolder(view) {
+        class ViewHolderGroup(view: View, private val onItemClicked: (Int) -> Unit) : RecyclerView.ViewHolder(view) {
             val textView: TextView = view.findViewById(R.id.tvMonth)
             val arrow: ImageView = view.findViewById(R.id.imageView)
 
@@ -102,7 +117,7 @@ class TracksListActivity : AppCompatActivity() {
             }
         }
 
-        class ViewHolderMonthSummary(view: View) : RecyclerView.ViewHolder(view) {
+        class ViewHolderGroupSummary(view: View) : RecyclerView.ViewHolder(view) {
             val titles = arrayOf(view.findViewById<TextView>(R.id.tvTitle1), view.findViewById(R.id.tvTitle2),view.findViewById(R.id.tvTitle3))
             val values = arrayOf(view.findViewById<TextView>(R.id.tvValue1), view.findViewById(R.id.tvValue2),view.findViewById(R.id.tvValue3))
         }
@@ -110,8 +125,8 @@ class TracksListActivity : AppCompatActivity() {
         override fun getItemViewType(position: Int): Int {
             return when {
                 objects[position] is TrackDB -> VIEW_TYPE_ITEM
-                objects[position] is MonthSummary -> VIEW_TYPE_MONTH_SUMMARY
-                else -> VIEW_TYPE_MONTH
+                objects[position] is GroupSummary -> VIEW_TYPE_GROUP_SUMMARY
+                else -> VIEW_TYPE_GROUP
             }
         }
 
@@ -122,12 +137,12 @@ class TracksListActivity : AppCompatActivity() {
                     ViewHolderItem(LayoutInflater.from(viewGroup.context)
                             .inflate(R.layout.tracks_list_item, viewGroup, false), onItemClicked)
                 }
-                VIEW_TYPE_MONTH -> {
-                    ViewHolderMonth(LayoutInflater.from(viewGroup.context)
+                VIEW_TYPE_GROUP -> {
+                    ViewHolderGroup(LayoutInflater.from(viewGroup.context)
                             .inflate(R.layout.tracks_list_item_month_name, viewGroup, false), onItemClicked)
                 }
-                VIEW_TYPE_MONTH_SUMMARY -> {
-                    ViewHolderMonthSummary(LayoutInflater.from(viewGroup.context)
+                VIEW_TYPE_GROUP_SUMMARY -> {
+                    ViewHolderGroupSummary(LayoutInflater.from(viewGroup.context)
                             .inflate(R.layout.tracks_list_item_month_summary, viewGroup, false))
                 }
                 else -> throw NullPointerException()
@@ -147,18 +162,18 @@ class TracksListActivity : AppCompatActivity() {
 
                     viewHolderItem.image.setImageResource(track.exerciseType.getIconId())
                 }
-                VIEW_TYPE_MONTH -> {
-                    val viewHolderMonth = viewHolder as ViewHolderMonth
-                    val monthItem = objects[position] as MonthItem
-                    viewHolderMonth.textView.text = monthItem.month.toString()
-                    viewHolderMonth.arrow.rotation = if (monthItem.hided) 270f else 90f
+                VIEW_TYPE_GROUP -> {
+                    val viewHolderGroup = viewHolder as ViewHolderGroup
+                    val groupItem = objects[position] as GroupItem
+                    viewHolderGroup.textView.text = groupItem.groupName
+                    viewHolderGroup.arrow.rotation = if (groupItem.hided) 270f else 90f
                 }
-                VIEW_TYPE_MONTH_SUMMARY -> {
-                    val viewHolderMonthSummary = viewHolder as ViewHolderMonthSummary
-                    val descriptions = (objects[position] as MonthSummary).getDescriptions().toList()
-                    for (i in viewHolderMonthSummary.titles.indices) {
-                        viewHolderMonthSummary.titles[i].text = descriptions[i].first
-                        viewHolderMonthSummary.values[i].text = descriptions[i].second
+                VIEW_TYPE_GROUP_SUMMARY -> {
+                    val viewHolderGroupSummary = viewHolder as ViewHolderGroupSummary
+                    val descriptions = (objects[position] as GroupSummary).getDescriptions().toList()
+                    for (i in viewHolderGroupSummary.titles.indices) {
+                        viewHolderGroupSummary.titles[i].text = descriptions[i].first
+                        viewHolderGroupSummary.values[i].text = descriptions[i].second
                     }
                 }
                 else -> {}
@@ -173,9 +188,10 @@ class TracksListActivity : AppCompatActivity() {
 
     private var mAllTracks : List<TrackDB>? = null
     private val mListObjects = mutableListOf<Any>()
-    private val mHidedMonths = hashSetOf<String>()
+    private val mHidedGroups = hashSetOf<String>()
     private var mRecyclerAdapter : TracksListAdapter? = null
     private var mFilter = ExerciseType.UNKNOWN
+    private var mGroupType = GroupType.values().first()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -184,14 +200,12 @@ class TracksListActivity : AppCompatActivity() {
         mAllTracks = TracksDatabase.loadAllTracks().sortedByDescending { track -> track.date }
         var types = ExerciseType.values().filter { t -> t == ExerciseType.UNKNOWN ||  mAllTracks!!.any { track -> track.exerciseType == t }}
 
-        val spinnerAdapter = ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, types.map { t -> t.getName() })
-        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-
-        val spinner = findViewById<View>(R.id.spinner) as Spinner
-        spinner.adapter = spinnerAdapter
-        spinner.setSelection(0)
-
-        spinner.onItemSelectedListener = object : OnItemSelectedListener {
+        val spinnerTypesAdapter = ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, types.map { t -> t.getName() })
+        spinnerTypesAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        val spinnerTypes = findViewById<View>(R.id.spinner) as Spinner
+        spinnerTypes.adapter = spinnerTypesAdapter
+        spinnerTypes.setSelection(0)
+        spinnerTypes.onItemSelectedListener = object : OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View,
                                         position: Int, id: Long) {
                 mFilter = types[position]
@@ -201,6 +215,22 @@ class TracksListActivity : AppCompatActivity() {
             override fun onNothingSelected(arg0: AdapterView<*>?) {}
         }
 
+        val spinnerGroupsAdapter = ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, GroupType.values().map { t -> t.getName() })
+        spinnerGroupsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        val spinnerGroups = findViewById<View>(R.id.spinner_groups) as Spinner
+        spinnerGroups.adapter = spinnerGroupsAdapter
+        spinnerGroups.setSelection(0)
+        spinnerGroups.onItemSelectedListener = object : OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View,
+                                        position: Int, id: Long) {
+                mGroupType =  GroupType.values()[position]
+                updateListObjects()
+            }
+
+            override fun onNothingSelected(arg0: AdapterView<*>?) {}
+        }
+
+
         val recyclerView = findViewById<RecyclerView>(R.id.rvTracks)
         mRecyclerAdapter = TracksListAdapter(mListObjects) { pos ->
             val obj = mListObjects[pos]
@@ -208,11 +238,11 @@ class TracksListActivity : AppCompatActivity() {
                 val intent = Intent(this, ShowTrackActivity::class.java)
                 intent.putExtra(ShowTrackActivity.TRACK_ID_INTENT_STRING, obj.id)
                 startActivity(intent)
-            } else if (obj is MonthItem) {
-                if (mHidedMonths.contains(obj.month))
-                    mHidedMonths.remove(obj.month)
+            } else if (obj is GroupItem) {
+                if (mHidedGroups.contains(obj.groupName))
+                    mHidedGroups.remove(obj.groupName)
                 else
-                    mHidedMonths.add(obj.month)
+                    mHidedGroups.add(obj.groupName)
 
                 updateListObjects()
             }
@@ -224,32 +254,38 @@ class TracksListActivity : AppCompatActivity() {
 
     private fun updateListObjects() {
         mListObjects.clear()
-        var currentMonth : String? = null
-        var currentMonthIndex = 0
-        var currentMonthSummary : MonthSummary? = null
+        var currentGroupName : String? = null
+        var currentGroupIndex = 0
+        var currentGroupSummary : GroupSummary? = null
         for (track in mAllTracks!!.filter { t -> mFilter == ExerciseType.UNKNOWN || t.exerciseType == mFilter }) {
-            val month =  SimpleDateFormat("MMMM yyyy", Locale.ENGLISH).format(track.date).toUpperCase()
-            if (currentMonth != month) {
-                if (currentMonthSummary != null) {
-                    mListObjects.add(currentMonthIndex, currentMonthSummary)
-                    currentMonthSummary = null
+            val groupName =
+                    when (mGroupType) {
+                        GroupType.MONTH -> SimpleDateFormat("MMMM yyyy", Locale.ENGLISH).format(track.date).toUpperCase()
+                        GroupType.YEAR -> SimpleDateFormat("yyyy", Locale.ENGLISH).format(track.date).toUpperCase()
+                        GroupType.ALL_TIME -> "All tracks"
+                    }
+
+            if (currentGroupName != groupName) {
+                if (currentGroupSummary != null) {
+                    mListObjects.add(currentGroupIndex, currentGroupSummary)
+                    currentGroupSummary = null
                 }
 
-                mListObjects.add(MonthItem(month, mHidedMonths.contains(month)))
-                currentMonth = month
-                currentMonthIndex = mListObjects.size
-                if (!mHidedMonths.contains(month))
-                    currentMonthSummary = MonthSummary(mFilter != ExerciseType.UNKNOWN)
+                mListObjects.add(GroupItem(groupName, mHidedGroups.contains(groupName)))
+                currentGroupName = groupName
+                currentGroupIndex = mListObjects.size
+                if (!mHidedGroups.contains(groupName))
+                    currentGroupSummary = GroupSummary(mFilter != ExerciseType.UNKNOWN)
             }
 
-            if (!mHidedMonths.contains(month)) {
+            if (!mHidedGroups.contains(groupName)) {
                 mListObjects.add(track)
-                currentMonthSummary?.addTrack(track)
+                currentGroupSummary?.addTrack(track)
             }
 
         }
-        if (currentMonthSummary != null)
-            mListObjects.add(currentMonthIndex, currentMonthSummary)
+        if (currentGroupSummary != null)
+            mListObjects.add(currentGroupIndex, currentGroupSummary)
 
         mRecyclerAdapter?.notifyDataSetChanged()
     }

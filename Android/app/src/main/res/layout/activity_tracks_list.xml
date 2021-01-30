@@ -3,8 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".activities.StepCounterTestActivity">
+    android:layout_height="match_parent">
 
     <TextView
         android:id="@+id/tvTest"
@@ -49,5 +48,15 @@
         app:layout_constraintBottom_toTopOf="@+id/rvTracks"
         app:layout_constraintStart_toEndOf="@+id/btnBack"
         app:layout_constraintTop_toTopOf="@+id/tvTest" />
+
+    <Spinner
+        android:id="@+id/spinner_groups"
+        android:layout_width="150dp"
+        android:layout_height="38dp"
+        android:background="@drawable/spinner"
+        app:layout_constraintBottom_toBottomOf="@+id/spinner"
+        app:layout_constraintStart_toEndOf="@+id/spinner"
+        app:layout_constraintTop_toTopOf="@+id/spinner"
+        app:layout_constraintVertical_bias="0.277" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
