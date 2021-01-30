@@ -5,6 +5,7 @@ import com.max.spirihin.mytracksdb.utilities.Utils
 import java.util.*
 import com.max.spirihin.mytracksdb.utilities.toShortString
 import kotlin.collections.ArrayList
+import kotlin.math.max
 import kotlin.math.min
 
 class Track (val exerciseType : ExerciseType) {
@@ -67,21 +68,27 @@ class Track (val exerciseType : ExerciseType) {
     val dateStr: String
         get() = date.toShortString()
 
-    val speechDistance : Int
-        get() = if (exerciseType == ExerciseType.EASY_RUN) 500 else Int.MAX_VALUE
-
-    val speechStr: String
-        get() {
-            return "Pass $distance meters." + if (averageHeartrate > 0) "Average heartrate is $averageHeartrate" else ""
-        }
-
     val averageAltitude : Double
         get() = if (segments.isNotEmpty()) segments.sumByDouble { s -> s.averageAltitude } / segments.count() else 0.0
 
     val averageSpeedNative : Double
         get() = if (segments.isNotEmpty()) segments.sumByDouble { s -> s.averageSpeedNative } / segments.count() else 0.0
 
+    val maxSpeedNative : Double
+        get() {
+            var speed = 0.0
+            for (segment in segments) {
+                for (point in segment.points) {
+                    speed = max(speed, point.speed)
+                }
+            }
+            return speed
+        }
+
     val averagePaceNative : Int
+        get() = if (averageSpeedNative > 0) (1000.0 / averageSpeedNative).toInt() else 0
+
+    val maxPaceNative : Int
         get() = if (averageSpeedNative > 0) (1000.0 / averageSpeedNative).toInt() else 0
 
     val infoStr: String
@@ -93,6 +100,7 @@ class Track (val exerciseType : ExerciseType) {
                     "averageAltitude = $averageAltitude\n" +
                     "pace = ${Utils.secondsToString(pace)}\n" +
                     "max pace = ${Utils.secondsToString(fastestPace)}\n" +
+                    "max pace native = ${Utils.secondsToString(maxPaceNative)}\n" +
                     "average speed native = ${averageSpeedNative}\n" +
                     "average pace native = ${Utils.secondsToString(averagePaceNative)}\n" +
                     "sectors = ${segments.size}\n" +
@@ -150,6 +158,34 @@ class Track (val exerciseType : ExerciseType) {
         needNewSegment = false
 
         segments.last().points.add(point)
+    }
+
+    //TODO work with several segments
+    fun getPaceAtSegments() : Map<Int, Int> {
+        var result = mutableMapOf<Int, Int>()
+        for (segment in segments) {
+            for (i in 0..(segment.distance / 1000)) {
+                val start = i * 1000
+                val end = min((i + 1) * 1000, segment.distance)
+                result[end] = (1000.0 / segment.getSpeedAtRange(start, end)).toInt()
+            }
+        }
+
+        return result
+    }
+
+    //TODO work with several segments
+    fun getHeartrateAtSegments() : Map<Int, Int> {
+        var result = mutableMapOf<Int, Int>()
+        for (segment in segments) {
+            for (i in 0..(segment.distance / 1000)) {
+                val start = i * 1000
+                val end = min((i + 1) * 1000, segment.distance)
+                result[end] = segment.getHeartrateAtRange(start, end)
+            }
+        }
+
+        return result
     }
 
     //endregion

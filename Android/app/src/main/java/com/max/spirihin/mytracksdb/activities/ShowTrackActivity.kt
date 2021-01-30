@@ -1,5 +1,6 @@
 package com.max.spirihin.mytracksdb.activities
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.ImageButton
@@ -55,6 +56,13 @@ class ShowTrackActivity : AppCompatActivity() {
                         finish()
                     }
                     .setNegativeButton(android.R.string.cancel, null).show()
+        }
+
+        findViewById<Button>(R.id.btnOldView).setOnClickListener {
+            val intent = Intent(this, ShowTrackActivityOld::class.java)
+            intent.putExtra(ShowTrackActivityOld.TRACK_ID_INTENT_STRING, track.id)
+            startActivity(intent)
+            finish()
         }
     }
 }

@@ -8,66 +8,10 @@
 
 
     <LinearLayout
+        android:id="@+id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="100px"
-            android:inputType="number"
-            android:text="GPS update time (in seconds)"/>
-        <EditText
-            android:id="@+id/etGPSSeconds"
-            android:layout_width="match_parent"
-            android:layout_height="150px"
-            android:inputType="number"
-            android:text="1"/>
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="100px"
-            android:inputType="number"
-            android:text="GPS update distance (in meters)"/>
-
-        <EditText
-            android:id="@+id/etGPSMeters"
-            android:layout_width="match_parent"
-            android:layout_height="150px"
-            android:inputType="number"
-            android:text="1"/>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="100px"
-            android:inputType="number"
-            android:text="Max allowed gps accuracy (in meters)"/>
-
-        <EditText
-            android:id="@+id/etGPSAccuracy"
-            android:layout_width="match_parent"
-            android:layout_height="150px"
-            android:inputType="number"
-            android:text="1"/>
-
-
-        <Button
-            android:id="@+id/btnUpdateDB"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="update database"/>
-
-        <Button
-            android:id="@+id/btnBackupDB"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="backup database"/>
-
-        <Button
-            android:id="@+id/btnRestoreDB"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="restore database"/>
-    </LinearLayout>
+        android:orientation="vertical"/>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

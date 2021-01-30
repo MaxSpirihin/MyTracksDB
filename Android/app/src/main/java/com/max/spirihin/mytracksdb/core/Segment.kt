@@ -116,6 +116,33 @@ class Segment {
         return (distance - startDistance) / (endTime - startTime)
     }
 
+    fun getHeartrateAtRange(start: Int, end: Int) : Int {
+        var distance = 0.0
+        var startDistance : Double? = null
+        var heartrateSum = 0
+        var pointsCount = 0
+        for (i in 0 until points.size - 1) {
+            distance += TrackPoint.distanceBetween(points[i], points[i+1])
+            if (startDistance == null && distance >= start) {
+                startDistance = distance
+            }
+
+            if (distance >= start) {
+                heartrateSum += points[i].heartrate
+                pointsCount++
+            }
+
+            if (distance > end) {
+                break
+            }
+        }
+
+        if (pointsCount == 0)
+            return 0
+
+        return heartrateSum / pointsCount
+    }
+
     val fastestPace : Int
         get() {
             val maxSpeed = maxSpeed

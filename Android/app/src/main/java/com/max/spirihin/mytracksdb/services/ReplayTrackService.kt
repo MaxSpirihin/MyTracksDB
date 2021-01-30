@@ -34,7 +34,7 @@ class ReplayTrackService : TrackPointsProviderService() {
         }
         weatherInfo = track.weatherInfo
         mTimer = Timer()
-        mTimer!!.schedule(0, 100) {
+        mTimer!!.schedule(0, 500) {
             moveToNext()
         }
     }
@@ -60,7 +60,7 @@ class ReplayTrackService : TrackPointsProviderService() {
         context.stopService(Intent(context, ReplayTrackService::class.java))
     }
 
-    fun moveToNext() {
+    private fun moveToNext() {
         if (mPointIndex < mAllPoints.size - 1)
             mPointIndex++
 

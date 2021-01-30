@@ -19,7 +19,7 @@ class ShowTrackPageFragmentAdapter(fm: FragmentManager, context: Context, val tr
     override fun getItem(position: Int): Fragment {
         return when (tabs[position]) {
             ShowTrackTab.TRACK -> ShowTrackFragmentTrack(track)
-            ShowTrackTab.PACE -> PageFragment.newInstance(position + 1)
+            ShowTrackTab.SEGMENTS -> ShowTrackFragmentSegments(track)
             ShowTrackTab.SUMMARY -> PageFragment.newInstance(position + 1)
             ShowTrackTab.INFO -> ShowTrackFragmentInfo(track)
         }
@@ -28,8 +28,8 @@ class ShowTrackPageFragmentAdapter(fm: FragmentManager, context: Context, val tr
     override fun getPageTitle(position: Int): CharSequence? {
         return when (tabs[position]) {
             ShowTrackTab.TRACK -> "Track"
-            ShowTrackTab.PACE -> "Pace"
-            ShowTrackTab.SUMMARY -> "Summary"
+            ShowTrackTab.SEGMENTS -> "Pace"
+            ShowTrackTab.SUMMARY -> "Details"
             ShowTrackTab.INFO -> "Info"
         }
     }

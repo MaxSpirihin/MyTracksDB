@@ -25,4 +25,10 @@ object Utils {
         val s = seconds % 60
         return "${String.format("%02d",m)}'${String.format("%02d",s)}\" ${if (showKMText) "/km" else ""}"
     }
+
+    fun timeToSpeechString(seconds : Int) : String {
+        val h = (seconds / 3600) % 3600
+        val m = (seconds / 60) % 60
+        return "${if (h>0) "$h hours" else ""} $m minutes"
+    }
 }

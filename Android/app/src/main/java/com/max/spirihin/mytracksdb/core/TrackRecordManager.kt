@@ -7,16 +7,8 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import android.widget.Toast
 import androidx.core.app.NotificationCompat
-import com.android.volley.Request
-import com.android.volley.RequestQueue
-import com.android.volley.Response
-import com.android.volley.toolbox.JsonObjectRequest
-import com.android.volley.toolbox.Volley
-import com.garmin.fit.Bool
-import com.max.spirihin.mytracksdb.Helpers.TextToSpeechHelper
-import com.max.spirihin.mytracksdb.R
+import com.max.spirihin.mytracksdb.Helpers.TrackSpeaker
 import com.max.spirihin.mytracksdb.activities.RecordTrackActivity
 import com.max.spirihin.mytracksdb.services.RecordTrackService
 import com.max.spirihin.mytracksdb.services.ReplayTrackService
@@ -31,10 +23,9 @@ object TrackRecordManager {
     //endregion
 
     //region attributes
-    private var mDistanceForSpeech : Int = 0
     private var mObservers = HashSet<() -> Unit>()
     private var mService : TrackPointsProviderService? = null
-    private var mTextToSpeech: TextToSpeechHelper? = null
+    private var mSpeaker: TrackSpeaker? = null
     private var mNotification: Notification? = null
     //endregion
 
@@ -85,8 +76,7 @@ object TrackRecordManager {
         Print.Log("Start record track")
         recordState = RecordState.RECORD
         track = Track(exerciseType)
-        mTextToSpeech = TextToSpeechHelper(context.applicationContext)
-        mDistanceForSpeech = track!!.speechDistance
+        mSpeaker = TrackSpeaker(context.applicationContext)
 
         val startPoint = mService?.getCurrentPoint()
         if (startPoint != null)
@@ -137,7 +127,7 @@ object TrackRecordManager {
         Print.Log("Stop record")
         recordState = RecordState.NONE
 
-        mTextToSpeech?.destroy()
+        mSpeaker?.destroy()
         destroyService(context)
         TrackRecordManager.track = null
 
@@ -168,11 +158,7 @@ object TrackRecordManager {
             return
 
         track!!.addPoint(point)
-
-        if (track!!.distance > mDistanceForSpeech) {
-            mTextToSpeech!!.speak(track!!.speechStr)
-            mDistanceForSpeech = track!!.distance + track!!.speechDistance
-        }
+        mSpeaker!!.onTrackUpdated(track!!)
 
         updateNotification("Running", "${track!!.distance}m. | ${track!!.duration / 60}:${track!!.duration % 60}")
     }
@@ -185,7 +171,7 @@ object TrackRecordManager {
         mNotification = NotificationCompat.Builder(service, CHANNEL_ID)
                 .setContentTitle(title)
                 .setContentText(text)
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setSmallIcon((track?.exerciseType ?: ExerciseType.EASY_RUN).getIconId())
                 .setContentIntent(pendingIntent)
                 .build()
 

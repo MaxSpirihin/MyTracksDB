@@ -12,6 +12,7 @@ import androidx.core.content.ContextCompat
 import com.max.spirihin.mytracksdb.R
 import com.max.spirihin.mytracksdb.core.*
 import com.max.spirihin.mytracksdb.utilities.Preferences
+import com.max.spirihin.mytracksdb.utilities.UIUtils
 import com.max.spirihin.mytracksdb.utilities.Utils
 import com.max.spirihin.mytracksdb.utilities.toStringFormat
 import com.yandex.mapkit.MapKitFactory
@@ -86,6 +87,7 @@ class MainActivity : AppCompatActivity() {
         findViewById<ImageButton>(R.id.btnTestRecord).setOnClickListener {
             val intent = Intent(this, RecordTrackActivity::class.java)
             intent.putExtra(RecordTrackActivity.USE_TEST_SERVICE_INTENT_STRING, true)
+            intent.putExtra(RecordTrackActivity.EXERCISE_TYPE_INTENT_STRING, ExerciseType.EASY_RUN.toString())
             startActivity(intent)
         }
     }
@@ -111,19 +113,19 @@ class MainActivity : AppCompatActivity() {
         val margin = resources.getDimension(R.dimen.menu_main_margin).toInt()
 
         recordView = inflateRecordView()
-        addToLinearLayout(layoutMain!!, recordView!!, margin, margin, margin, 0)
+        UIUtils.addToLinearLayout(layoutMain!!, recordView!!, margin, margin, margin, 0)
 
         tracksList = inflateTracksListView()
-        addToLinearLayout(layoutMain!!, tracksList!!, margin, margin, margin, 0)
+        UIUtils.addToLinearLayout(layoutMain!!, tracksList!!, margin, margin, margin, 0)
 
         for (i in 0 until types.size / buttonsInRow) {
             val linearLayout = LinearLayout(this)
             linearLayout.orientation = LinearLayout.HORIZONTAL
-            addToLinearLayout(layoutMain!!, linearLayout, margin / 2, margin, margin / 2, 0)
+            UIUtils.addToLinearLayout(layoutMain!!, linearLayout, margin / 2, margin, margin / 2, 0)
             for (j in 0 until buttonsInRow) {
                 val index = i * buttonsInRow + j
                 val exercise = if (index >= types.size) ExerciseType.UNKNOWN else types[i * buttonsInRow + j]
-                addToLinearLayout(linearLayout, inflateStartButton(exercise), margin / 2, 0, margin / 2, 0)
+                UIUtils.addToLinearLayout(linearLayout, inflateStartButton(exercise), margin / 2, 0, margin / 2, 0)
             }
             startButtonsLayouts.add(linearLayout)
         }
@@ -158,7 +160,7 @@ class MainActivity : AppCompatActivity() {
                             View.VISIBLE else
                                 View.INVISIBLE
                 val duration = if (TrackRecordManager.recordState == RecordState.PAUSE) track.duration else track.durationForProcessing
-                recordView!!.findViewById<TextView>(R.id.tvDuration).text = "${Utils.secondsToString(duration)}"
+                recordView!!.findViewById<TextView>(R.id.tvDuration).text = Utils.secondsToString(duration)
                 recordView!!.findViewById<ImageView>(R.id.ivExercityType).setImageResource(track.exerciseType.getIconId())
             }
         }
@@ -192,23 +194,6 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
         return view
-    }
-
-    private fun addToLinearLayout(
-            linearLayout: LinearLayout,
-            view: View,
-            marginLeft: Int,
-            marginTop: Int,
-            marginRight: Int,
-            marginBottom: Int) {
-        val lp = LinearLayout.LayoutParams(
-                if (linearLayout.orientation == LinearLayout.HORIZONTAL) 0 else LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                1f
-        )
-        lp.setMargins(marginLeft, marginTop, marginRight, marginBottom)
-        view.layoutParams = lp
-        linearLayout.addView(view)
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {

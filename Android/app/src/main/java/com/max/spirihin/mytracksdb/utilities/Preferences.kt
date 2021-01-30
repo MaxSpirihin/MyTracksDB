@@ -14,36 +14,49 @@ object Preferences {
 
     var gpsUpdateMeters: Int
     get() {
-        return sharedPreferences!!.getInt("gps_update_meters", 1)
+        return getInt("gps_update_meters", 1)
     }
     set(value) {
-        with (sharedPreferences!!.edit()) {
-            putInt("gps_update_meters", value)
-            apply()
-        }
+        setInt("gps_update_meters", value)
     }
 
     var gpsUpdateSeconds: Int
         get() {
-            return sharedPreferences!!.getInt("gps_update_seconds", 1)
+            return getInt("gps_update_seconds", 1)
         }
-        set(value) {
-            with (sharedPreferences!!.edit()) {
-                putInt("gps_update_seconds", value)
-                apply()
-            }
+        set (value) {
+            setInt("gps_update_seconds", value)
         }
 
     var gpsMaxAccuracy: Int
         get() {
-            return sharedPreferences!!.getInt("gps_max_accuracy", 20)
+            return getInt("gps_max_accuracy", 20)
         }
         set(value) {
-            with (sharedPreferences!!.edit()) {
-                putInt("gps_max_accuracy", value)
-                apply()
-            }
+            setInt("gps_max_accuracy", value)
         }
+
+    fun getInt(key: String, default: Int) : Int {
+        return sharedPreferences!!.getInt(key, default)
+    }
+
+    fun setInt(key: String, value: Int) {
+        with (sharedPreferences!!.edit()) {
+            putInt(key, value)
+            apply()
+        }
+    }
+
+    fun getBoolean(key: String, default: Boolean) : Boolean {
+        return sharedPreferences!!.getBoolean(key, default)
+    }
+
+    fun setBoolean(key: String, value: Boolean) {
+        with (sharedPreferences!!.edit()) {
+            putBoolean(key, value)
+            apply()
+        }
+    }
 
     fun getString(key: String, default: String) : String {
         return sharedPreferences!!.getString(key, default) ?: default
